@@ -1,0 +1,10 @@
+Env: develop
+
+ServerName: gapiservice
+
+BasePath: "./"
+
+Log:
+  Level: 4
+  Output: "stdout"
+  FilePath: "./log"
