@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/huaixiaohai/gapiservice/config"
 	"github.com/huaixiaohai/lib/log"
 )
@@ -15,6 +14,7 @@ func init() {
 }
 
 func main(){
-	engine := gin.New()
-	engine.Run(":8000")
+	app := NewApp()
+	app.Run()
+	app.WaitQuit()
 }

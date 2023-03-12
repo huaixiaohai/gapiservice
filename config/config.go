@@ -18,9 +18,10 @@ var (
 )
 
 type Config struct {
-	Env string
+	RunEnv string
 	ServerName string
 	Log           *Log
+	Http *Http
 }
 
 
@@ -30,6 +31,11 @@ type Log struct {
 	FilePath string
 }
 
+type Http struct {
+	Addr string
+	CertFile string
+	KeyFile string
+}
 
 func init() {
 	flag.StringVar(&file, "c", "./config/config.yaml", "config file path")

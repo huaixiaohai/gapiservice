@@ -1,4 +1,4 @@
-Env: develop
+RunEnv: develop
 
 ServerName: gapiservice
 
@@ -8,3 +8,6 @@ Log:
   Level: 4
   Output: "stdout"
   FilePath: "./log"
+
+Http:
+  Addr: ":9000"
