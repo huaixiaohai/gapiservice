@@ -3,8 +3,9 @@ module github.com/huaixiaohai/gapiservice
 go 1.17
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.9.0
-	github.com/huaixiaohai/lib v0.0.0-20230312055038-febd34f6ab42
+	github.com/huaixiaohai/lib v0.0.0-20230313083011-a96ec2b58866
 	github.com/spf13/viper v1.15.0
 )
 

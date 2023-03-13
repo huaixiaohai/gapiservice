@@ -3,8 +3,10 @@ package main
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/huaixiaohai/gapiservice/api"
+	"github.com/huaixiaohai/gapiservice/auth"
 	"github.com/huaixiaohai/gapiservice/config"
 	"github.com/huaixiaohai/lib/log"
 	"net/http"
@@ -14,6 +16,7 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+	"time"
 )
 
 func NewApp() *App {
@@ -44,7 +47,7 @@ type App struct {
 	engine *gin.Engine
 	server *http.Server
 
-	loginApi *api.LoginApi
+	userApi *api.UserApi
 }
 
 func (a *App) Run() {
@@ -77,7 +80,8 @@ func (a *App) registerRouter() {
 	g.Use(gin.Logger())
 	g.Use(gin.Recovery())
 
-	g.POST("/api/v1/inzone/login", wrapper(a.loginApi.Login))
+	g.POST("/api/v1/login", wrapper(a.userApi.Login))
+	g.GET("/api/v1/user/get", userAuthMiddleware(), wrapper(a.userApi.Get))
 }
 
 func wrapper(f interface{}) func(*gin.Context) {
@@ -154,21 +158,25 @@ func Res(c *gin.Context, resp interface{}, err error) {
 	type Body struct {
 		Code    int         `json:"code"`
 		Message string      `json:"message"`
-		Data    interface{} `json:"data"`
+		Result    interface{} `json:"result"`
 	}
 
 	body := &Body{
-		Data: resp,
+		Result: resp,
 	}
 
-	//if err != nil {
-	//	body.Message = err.Error()
-	//	body.Code = err.(*errors.ResponseError).Code
-	//} else {
-	//	body.Code = http.StatusOK
-	//}
+	if err != nil {
+		body.Message = err.Error()
+		if body.Message == "auth" {
+			body.Code = 401
+		} else {
+			body.Code = 500
+		}
+	} else {
+		body.Code = 0
+	}
 
-	buf, e := json.Marshal(resp)
+	buf, e := json.Marshal(body)
 	if e != nil {
 		log.Error(e)
 	}
@@ -176,4 +184,25 @@ func Res(c *gin.Context, resp interface{}, err error) {
 	//c.Set(ResBodyKey, buf)
 	c.Data(body.Code, "application/json; charset=utf-8", buf)
 	c.Abort()
+}
+
+func userAuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		var token string
+		authorization := c.GetHeader("Authorization")
+		prefix := "Bearer "
+		if authorization != "" && strings.HasPrefix(authorization, prefix) {
+			token = authorization[len(prefix):]
+		}
+
+		userID, userName, expireAt, err := auth.ParseToken(token)
+		if err != nil || expireAt <= time.Now().Local().Unix() {
+			Res(c, nil, errors.New("auth"))
+			return
+		}
+		println(userID, userName)
+		c.Set("UserID", userID)
+		c.Next()
+	}
 }
