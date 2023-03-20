@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/spf13/viper"
 )
@@ -18,12 +19,13 @@ var (
 )
 
 type Config struct {
-	RunEnv string
+	RunEnv     string
 	ServerName string
-	Log           *Log
-	Http *Http
+	Log        *Log
+	Http       *Http
+	Gorm       *Gorm
+	MySQL      *MySQL
 }
-
 
 type Log struct {
 	Level    uint32
@@ -32,9 +34,35 @@ type Log struct {
 }
 
 type Http struct {
-	Addr string
+	Addr     string
 	CertFile string
-	KeyFile string
+	KeyFile  string
+}
+
+// Gorm gorm配置参数
+type Gorm struct {
+	Debug             bool
+	DBType            string
+	MaxLifetime       int
+	MaxOpenConns      int
+	MaxIdleConns      int
+	EnableAutoMigrate bool
+}
+
+// MySQL mysql配置参数
+type MySQL struct {
+	Host       string
+	Port       int
+	User       string
+	Password   string
+	DBName     string
+	Parameters string
+}
+
+// DSN 数据库连接串
+func (a MySQL) DSN() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s",
+		a.User, a.Password, a.Host, a.Port, a.DBName, a.Parameters)
 }
 
 func init() {
