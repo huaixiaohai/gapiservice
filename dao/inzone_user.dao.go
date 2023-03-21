@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+
 	"github.com/google/wire"
 	"github.com/huaixiaohai/gapiservice/dao/model"
 	"github.com/huaixiaohai/gapiservice/pb"
@@ -53,9 +54,9 @@ func (a *InzoneUserRepo) Get(ctx context.Context, id uint64) (*pb.InzoneUser, er
 }
 
 type InzoneUserListReq struct {
-	PageSize    int64
-	PageIndex   int64
-	Name        string
+	PageSize  int64
+	PageIndex int64
+	Name      string
 }
 
 // List 返回任务列表，按照优先级排序
@@ -78,5 +79,5 @@ func (a *InzoneUserRepo) listReq(ctx context.Context, req *InzoneUserListReq) *g
 	if req.Name != "" {
 		s.Where("name like ?", "%"+req.Name+"%")
 	}
-	return s.Order("priority desc, id desc").Limit(int(req.PageSize)).Offset(int((req.PageIndex - 1) * req.PageSize))
+	return s.Order("id desc").Limit(int(req.PageSize)).Offset(int((req.PageIndex - 1) * req.PageSize))
 }

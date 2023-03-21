@@ -2,24 +2,32 @@ package api
 
 import (
 	"errors"
+
+	"github.com/google/wire"
+
 	"github.com/gin-gonic/gin"
 	"github.com/huaixiaohai/gapiservice/auth"
 )
 
+var UserApiSet = wire.NewSet(NewUserApi)
+
+func NewUserApi() *UserApi {
+	return &UserApi{}
+}
+
+type UserApi struct {
+}
+
 type User struct {
-	ID string
-	Name string
+	ID       string
+	Name     string
 	Password string
 }
 
 var admin = &User{
 	ID:       "10",
 	Name:     "admin",
-	Password: "pwd123",
-}
-
-type UserApi struct {
-
+	Password: "admin123",
 }
 
 type LoginReq struct {
@@ -28,9 +36,9 @@ type LoginReq struct {
 }
 
 type LoginResp struct {
-	Token string `json:"token"`
-	TokenType   string `json:"token_type"`
-	ExpiresAt   int64  `json:"expires_at"`
+	Token     string `json:"token"`
+	TokenType string `json:"token_type"`
+	ExpiresAt int64  `json:"expires_at"`
 }
 
 func (a *UserApi) Login(ctx *gin.Context, req *LoginReq) (*LoginResp, error) {
@@ -44,13 +52,12 @@ func (a *UserApi) Login(ctx *gin.Context, req *LoginReq) (*LoginResp, error) {
 		return nil, err
 	}
 	return &LoginResp{
-		Token: token,
+		Token:     token,
 		ExpiresAt: expiresAt,
 	}, nil
 }
 
 type Empty struct {
-
 }
 
 type GetUserResp struct {
@@ -59,7 +66,6 @@ type GetUserResp struct {
 }
 
 func (a *UserApi) Get(ctx *gin.Context, req *Empty) (*GetUserResp, error) {
-
 
 	return &GetUserResp{
 		UserID:   admin.ID,

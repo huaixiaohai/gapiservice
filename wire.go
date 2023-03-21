@@ -1,3 +1,8 @@
+//go:build wireinject
+// +build wireinject
+
+// The build tag makes sure the stub is not built in the final build.
+
 package main
 
 import (
@@ -6,7 +11,7 @@ import (
 	"github.com/huaixiaohai/gapiservice/dao"
 )
 
-// BuildInjector 生成注入器
+// GetAppInstance 生成注入器
 func GetAppInstance() (*App, error) {
 	wire.Build(
 		NewApp,

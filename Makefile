@@ -14,8 +14,14 @@ build:
 	go build -o $(BIN_DIR)/main
 
 run:
-	go run main.go
+	go run .
 
 # 交叉编译出linux下的静态可执行文件build
 linux_build:
 	$(COMMONENVVAR) $(BUILDENVVAR) make build
+
+docker_build:build
+	 $(CURDIR)/deploy/build-image.sh
+
+wire:
+	wire gen ./

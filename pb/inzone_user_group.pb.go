@@ -10,4 +10,5 @@ type InzoneUserGroupListReq struct {
 }
 
 type InzoneUserGroupListResp struct {
+	List []*InzoneUserGroup
 }

@@ -21,7 +21,7 @@ Gorm:
   EnableAutoMigrate: true # 是否启用自动映射数据库表结构
 
 MySQL:
-  Host: "192.168.12.143" # 连接地址
+  Host: "192.168.1.6" # 连接地址
   Port: 3306 # 连接端口
   User: "root" # 用户名
   Password: "root123" # 密码

@@ -4,11 +4,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/huaixiaohai/gapiservice/api"
-	"github.com/huaixiaohai/gapiservice/auth"
-	"github.com/huaixiaohai/gapiservice/config"
-	"github.com/huaixiaohai/lib/log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,9 +12,18 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/huaixiaohai/gapiservice/api"
+	"github.com/huaixiaohai/gapiservice/auth"
+	"github.com/huaixiaohai/gapiservice/config"
+	"github.com/huaixiaohai/lib/log"
 )
 
-func NewApp() *App {
+func NewApp(
+	inzoneUserGroupApi *api.InzoneUserGroupApi,
+	userApi *api.UserApi,
+) *App {
 	engine := gin.New()
 	server := &http.Server{
 		Addr:              config.C.Http.Addr,
@@ -37,8 +41,10 @@ func NewApp() *App {
 		ConnContext:       nil,
 	}
 	app := &App{
-		engine: engine,
-		server: server,
+		engine:             engine,
+		server:             server,
+		inzoneUserGroupApi: inzoneUserGroupApi,
+		userApi:            userApi,
 	}
 	return app
 }
@@ -47,7 +53,8 @@ type App struct {
 	engine *gin.Engine
 	server *http.Server
 
-	userApi *api.UserApi
+	userApi            *api.UserApi
+	inzoneUserGroupApi *api.InzoneUserGroupApi
 }
 
 func (a *App) Run() {
@@ -82,6 +89,12 @@ func (a *App) registerRouter() {
 
 	g.POST("/api/v1/login", wrapper(a.userApi.Login))
 	g.GET("/api/v1/user/get", userAuthMiddleware(), wrapper(a.userApi.Get))
+
+	g.POST("/api/v1/inzone_user_group/create", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Create))
+	g.POST("/api/v1/inzone_user_group/update", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Update))
+	g.GET("/api/v1/inzone_user_group/get", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Get))
+	g.GET("/api/v1/inzone_user_group/list", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.List))
+	g.DELETE("/api/v1/inzone_user_group/delete", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Delete))
 }
 
 func wrapper(f interface{}) func(*gin.Context) {
@@ -118,7 +131,7 @@ func wrapper(f interface{}) func(*gin.Context) {
 		req := reflect.New(typ.In(1).Elem()).Interface()
 		c.Set("request", req)
 		err := c.ShouldBind(req)
-		if err != nil{
+		if err != nil {
 			// 参数不对处理
 			return
 		}
@@ -158,7 +171,7 @@ func Res(c *gin.Context, resp interface{}, err error) {
 	type Body struct {
 		Code    int         `json:"code"`
 		Message string      `json:"message"`
-		Result    interface{} `json:"result"`
+		Result  interface{} `json:"result"`
 	}
 
 	body := &Body{

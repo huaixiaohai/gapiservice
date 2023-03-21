@@ -3,12 +3,13 @@ package dao
 import (
 	"database/sql"
 	"fmt"
-	"github.com/huaixiaohai/gapiservice/config"
-	"github.com/huaixiaohai/gapiservice/dao/model"
 	"log"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/huaixiaohai/gapiservice/config"
+	"github.com/huaixiaohai/gapiservice/dao/model"
 
 	"gorm.io/gorm/logger"
 
@@ -16,16 +17,17 @@ import (
 
 	"gorm.io/gorm/schema"
 
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 var Set = wire.NewSet(
+	InzoneUserGroupRepoSet,
 	InzoneUserRepoSet,
 ) // end
 
 var models = []interface{}{
+	new(model.InzoneUserGroup),
 	new(model.InzoneUser),
 }
 
@@ -111,7 +113,9 @@ func createDatabaseWithMySQL() error {
 	defer db.Close()
 
 	err = db.Ping()
-
+	if err != nil {
+		return err
+	}
 	query := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` DEFAULT CHARACTER SET = `utf8mb4`;", cfg.DBName)
 	_, err = db.Exec(query)
 	return err
