@@ -4,6 +4,8 @@ import "github.com/huaixiaohai/gapiservice/pb"
 
 type InzoneUserGroup struct {
 	Model
+	Name         string
+	DingTalkHook string
 }
 
 func InzoneUserGroupFrom(one *pb.InzoneUserGroup) *InzoneUserGroup {
@@ -15,6 +17,8 @@ func InzoneUserGroupFrom(one *pb.InzoneUserGroup) *InzoneUserGroup {
 		Model: Model{
 			ID: one.ID,
 		},
+		Name:         one.Name,
+		DingTalkHook: one.DingTalkHook,
 	}
 }
 
@@ -24,7 +28,9 @@ func InzoneUserGroupTo(one *InzoneUserGroup) *pb.InzoneUserGroup {
 	}
 
 	return &pb.InzoneUserGroup{
-		ID: one.ID,
+		ID:           one.ID,
+		Name:         one.Name,
+		DingTalkHook: one.DingTalkHook,
 	}
 }
 

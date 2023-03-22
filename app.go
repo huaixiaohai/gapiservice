@@ -90,11 +90,11 @@ func (a *App) registerRouter() {
 	g.POST("/api/v1/login", wrapper(a.userApi.Login))
 	g.GET("/api/v1/user/get", userAuthMiddleware(), wrapper(a.userApi.Get))
 
-	g.POST("/api/v1/inzone_user_group/create", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Create))
-	g.POST("/api/v1/inzone_user_group/update", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Update))
-	g.GET("/api/v1/inzone_user_group/get", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Get))
-	g.GET("/api/v1/inzone_user_group/list", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.List))
-	g.DELETE("/api/v1/inzone_user_group/delete", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Delete))
+	g.POST("/api/v1/inzone/user_group/create", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Create))
+	g.POST("/api/v1/inzone/user_group/update", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Update))
+	g.GET("/api/v1/inzone/user_group/get", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Get))
+	g.GET("/api/v1/inzone/user_group/list", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.List))
+	g.DELETE("/api/v1/inzone/user_group/delete", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Delete))
 }
 
 func wrapper(f interface{}) func(*gin.Context) {
