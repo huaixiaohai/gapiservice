@@ -10,14 +10,19 @@ import (
 
 var InzoneUserApiSet = wire.NewSet(NewInzoneUserApi)
 
-func NewInzoneUserApi(userRepo *dao.InzoneUserRepo) *InzoneUserApi {
+func NewInzoneUserApi(
+	userRepo *dao.InzoneUserRepo,
+	userGroupRepo *dao.InzoneUserGroupRepo,
+) *InzoneUserApi {
 	return &InzoneUserApi{
-		userRepo: userRepo,
+		userRepo:      userRepo,
+		userGroupRepo: userGroupRepo,
 	}
 }
 
 type InzoneUserApi struct {
-	userRepo *dao.InzoneUserRepo
+	userRepo      *dao.InzoneUserRepo
+	userGroupRepo *dao.InzoneUserGroupRepo
 }
 
 func (a *InzoneUserApi) Create(ctx *gin.Context, req *pb.InzoneUser) (*pb.ID, error) {
@@ -41,6 +46,15 @@ func (a *InzoneUserApi) List(ctx *gin.Context, req *pb.InzoneUserListReq) (*pb.I
 	data, err := a.userRepo.List(ctx, &dao.InzoneUserListReq{})
 	if err != nil {
 		return nil, err
+	}
+	for _, v := range data {
+		group, err := a.userGroupRepo.Get(ctx, v.GroupID)
+		if err != nil {
+			return nil, err
+		}
+		if group != nil {
+			v.GroupName = group.Name
+		}
 	}
 	return &pb.InzoneUserListResp{
 		List: data,

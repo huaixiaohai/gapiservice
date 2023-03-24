@@ -6,8 +6,6 @@ import (
 	"github.com/google/wire"
 	"github.com/huaixiaohai/gapiservice/dao/model"
 	"github.com/huaixiaohai/gapiservice/pb"
-	"github.com/huaixiaohai/lib/log"
-
 	"gorm.io/gorm"
 )
 
@@ -37,7 +35,10 @@ func (a *InzoneUserRepo) Update(ctx context.Context, one *pb.InzoneUser) error {
 }
 
 func (a *InzoneUserRepo) Delete(ctx context.Context, id string) error {
-	log.Error("待实现")
+	err := getSession(ctx).Model(&model.InzoneUser{}).Where("id=?", id).Delete(&model.InzoneUser{}).Error
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

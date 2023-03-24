@@ -4,7 +4,7 @@ import "github.com/huaixiaohai/gapiservice/pb"
 
 type InzoneUserGroup struct {
 	Model
-	Name         string
+	Name         string `gorm:"type:varchar(20);uniqueIndex"`
 	DingTalkHook string
 }
 

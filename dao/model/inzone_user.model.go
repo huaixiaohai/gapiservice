@@ -4,7 +4,11 @@ import "github.com/huaixiaohai/gapiservice/pb"
 
 type InzoneUser struct {
 	Model
-
+	Name    string `gorm:"type:varchar(20);uniqueIndex:_name_phone"`
+	Phone   string `gorm:"type:varchar(20);uniqueIndex:_name_phone"`
+	Remark  string
+	GroupID string
+	Cookie  string
 }
 
 func InzoneUserFrom(one *pb.InzoneUser) *InzoneUser {
@@ -16,7 +20,11 @@ func InzoneUserFrom(one *pb.InzoneUser) *InzoneUser {
 		Model: Model{
 			ID: one.ID,
 		},
-
+		Name:    one.Name,
+		Phone:   one.Phone,
+		Remark:  one.Remark,
+		GroupID: one.GroupID,
+		Cookie:  one.Cookie,
 	}
 }
 
@@ -25,9 +33,13 @@ func InzoneUserTo(one *InzoneUser) *pb.InzoneUser {
 		return nil
 	}
 
-
 	return &pb.InzoneUser{
-		ID:          one.ID,
+		ID:      one.ID,
+		Name:    one.Name,
+		Phone:   one.Phone,
+		Remark:  one.Remark,
+		GroupID: one.GroupID,
+		Cookie:  one.Cookie,
 	}
 }
 
