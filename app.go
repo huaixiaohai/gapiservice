@@ -22,6 +22,7 @@ import (
 
 func NewApp(
 	inzoneUserGroupApi *api.InzoneUserGroupApi,
+	inzoneUserApi *api.InzoneUserApi,
 	userApi *api.UserApi,
 ) *App {
 	engine := gin.New()
@@ -45,6 +46,7 @@ func NewApp(
 		server:             server,
 		inzoneUserGroupApi: inzoneUserGroupApi,
 		userApi:            userApi,
+		inzoneUserApi:      inzoneUserApi,
 	}
 	return app
 }
@@ -55,6 +57,7 @@ type App struct {
 
 	userApi            *api.UserApi
 	inzoneUserGroupApi *api.InzoneUserGroupApi
+	inzoneUserApi      *api.InzoneUserApi
 }
 
 func (a *App) Run() {
@@ -95,6 +98,12 @@ func (a *App) registerRouter() {
 	g.GET("/api/v1/inzone/user_group/get", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Get))
 	g.GET("/api/v1/inzone/user_group/list", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.List))
 	g.DELETE("/api/v1/inzone/user_group/delete", userAuthMiddleware(), wrapper(a.inzoneUserGroupApi.Delete))
+
+	g.POST("/api/v1/inzone/user/create", userAuthMiddleware(), wrapper(a.inzoneUserApi.Create))
+	g.POST("/api/v1/inzone/user/update", userAuthMiddleware(), wrapper(a.inzoneUserApi.Update))
+	g.GET("/api/v1/inzone/user/get", userAuthMiddleware(), wrapper(a.inzoneUserApi.Get))
+	g.GET("/api/v1/inzone/user/list", userAuthMiddleware(), wrapper(a.inzoneUserApi.List))
+	g.DELETE("/api/v1/inzone/user/delete", userAuthMiddleware(), wrapper(a.inzoneUserApi.Delete))
 }
 
 func wrapper(f interface{}) func(*gin.Context) {

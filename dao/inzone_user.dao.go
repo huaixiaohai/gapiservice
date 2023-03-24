@@ -36,12 +36,12 @@ func (a *InzoneUserRepo) Update(ctx context.Context, one *pb.InzoneUser) error {
 	return nil
 }
 
-func (a *InzoneUserRepo) Delete(ctx context.Context, id uint64) error {
+func (a *InzoneUserRepo) Delete(ctx context.Context, id string) error {
 	log.Error("待实现")
 	return nil
 }
 
-func (a *InzoneUserRepo) Get(ctx context.Context, id uint64) (*pb.InzoneUser, error) {
+func (a *InzoneUserRepo) Get(ctx context.Context, id string) (*pb.InzoneUser, error) {
 	one := &model.InzoneUser{}
 	err := getSession(ctx).Model(&model.InzoneUser{}).Where("id=?", id).First(one).Error
 	if err == gorm.ErrRecordNotFound {

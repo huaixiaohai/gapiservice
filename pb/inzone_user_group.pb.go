@@ -1,14 +1,14 @@
 package pb
 
 type InzoneUserGroup struct {
-	ID           string
-	Name         string
-	DingTalkHook string
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	DingTalkHook string `json:"ding_talk_hook"`
 }
 
 type InzoneUserGroupListReq struct {
 }
 
 type InzoneUserGroupListResp struct {
-	List []*InzoneUserGroup
+	List []*InzoneUserGroup `json:"list"`
 }
