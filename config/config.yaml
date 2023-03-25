@@ -27,3 +27,6 @@ MySQL:
   Password: "root123" # 密码
   DBName: "inzone" # 数据库
   Parameters: "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true" # 连接参数
+
+Cron:
+  GetLuckListJob: "0 30 10 * * *" # 每天10.30开始执行，<秒 分 时 * * *>

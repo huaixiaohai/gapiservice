@@ -4,11 +4,12 @@ import "github.com/huaixiaohai/gapiservice/pb"
 
 type InzoneUser struct {
 	Model
-	Name    string `gorm:"type:varchar(20);uniqueIndex:_name_phone"`
-	Phone   string `gorm:"type:varchar(20);uniqueIndex:_name_phone"`
+	Name    string `gorm:"type:varchar(30)"`
+	Phone   string `gorm:"type:varchar(30)"`
 	Remark  string
 	GroupID string
 	Cookie  string
+	UniID   string `gorm:"type:varchar(30);uniqueIndex"`
 }
 
 func InzoneUserFrom(one *pb.InzoneUser) *InzoneUser {
@@ -25,6 +26,7 @@ func InzoneUserFrom(one *pb.InzoneUser) *InzoneUser {
 		Remark:  one.Remark,
 		GroupID: one.GroupID,
 		Cookie:  one.Cookie,
+		UniID:   one.UniID,
 	}
 }
 
@@ -40,6 +42,7 @@ func InzoneUserTo(one *InzoneUser) *pb.InzoneUser {
 		Remark:  one.Remark,
 		GroupID: one.GroupID,
 		Cookie:  one.Cookie,
+		UniID:   one.UniID,
 	}
 }
 

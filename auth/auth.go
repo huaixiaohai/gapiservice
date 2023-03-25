@@ -1,22 +1,23 @@
 package auth
 
 import (
-	"github.com/dgrijalva/jwt-go"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 type TokenClaims struct {
-	UserID string
+	UserID   string
 	UserName string
 	*jwt.StandardClaims
 }
 
 func GenToken(userID, userName string) (string, int64, error) {
 	nowTime := time.Now()
-	expireTime := nowTime.Add(300 * time.Second).Local().Unix()
+	expireTime := nowTime.Add(3000 * time.Second).Local().Unix()
 	issuer := "frank"
 	claims := &TokenClaims{
-		UserID: userID,
+		UserID:   userID,
 		UserName: userName,
 		StandardClaims: &jwt.StandardClaims{
 			ExpiresAt: expireTime,

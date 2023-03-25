@@ -78,7 +78,7 @@ func newGormDB() (*gorm.DB, error) {
 	}
 
 	if cfg.RunEnv == config.Develop {
-		//db = db.Debug()
+		db = db.Debug()
 	}
 
 	var sqlDB *sql.DB

@@ -25,6 +25,11 @@ type Config struct {
 	Http       *Http
 	Gorm       *Gorm
 	MySQL      *MySQL
+	Cron       *Cron
+}
+
+type Cron struct {
+	GetLuckListJob string
 }
 
 type Log struct {

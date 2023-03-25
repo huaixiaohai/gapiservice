@@ -8,6 +8,7 @@ type InzoneUser struct {
 	GroupID   string `json:"group_id"`
 	GroupName string `json:"group_name"`
 	Cookie    string `json:"cookie"`
+	UniID     string `json:"uni_id"`
 }
 
 type InzoneUserListReq struct {
