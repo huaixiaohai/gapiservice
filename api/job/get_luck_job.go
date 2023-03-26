@@ -108,7 +108,7 @@ func (a *GetLuckListJob) Run() {
 }
 
 func (a *GetLuckListJob) pushLuckMsg(group *pb.InzoneUserGroup, luckInzoneUsers []*LuckInzoneUser) {
-	text := fmt.Sprintf("今日消息\n")
+	text := ""
 	for _, v := range luckInzoneUsers {
 		count := 0
 		for _, user := range v.Users {
@@ -118,6 +118,7 @@ func (a *GetLuckListJob) pushLuckMsg(group *pb.InzoneUserGroup, luckInzoneUsers 
 			}
 		}
 		text = fmt.Sprintf("%s  (%d人)\n", v.Label, count) + text
+		text = fmt.Sprintf("今日消息\n") + text
 	}
 	log.Println(group.Name)
 	log.Println(text)
