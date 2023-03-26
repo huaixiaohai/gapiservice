@@ -9,7 +9,7 @@ type InzoneUser struct {
 	Remark  string
 	GroupID string
 	Cookie  string
-	UniID   string `gorm:"type:varchar(30);uniqueIndex"`
+	UUID    string `gorm:"uuid;type:varchar(30);uniqueIndex"`
 }
 
 func InzoneUserFrom(one *pb.InzoneUser) *InzoneUser {
@@ -26,7 +26,7 @@ func InzoneUserFrom(one *pb.InzoneUser) *InzoneUser {
 		Remark:  one.Remark,
 		GroupID: one.GroupID,
 		Cookie:  one.Cookie,
-		UniID:   one.UniID,
+		UUID:    one.UUID,
 	}
 }
 
@@ -42,7 +42,7 @@ func InzoneUserTo(one *InzoneUser) *pb.InzoneUser {
 		Remark:  one.Remark,
 		GroupID: one.GroupID,
 		Cookie:  one.Cookie,
-		UniID:   one.UniID,
+		UUID:    one.UUID,
 	}
 }
 

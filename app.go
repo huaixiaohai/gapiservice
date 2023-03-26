@@ -23,6 +23,7 @@ import (
 func NewApp(
 	inzoneUserGroupApi *api.InzoneUserGroupApi,
 	inzoneUserApi *api.InzoneUserApi,
+	inzoneApi *api.InzoneApi,
 	userApi *api.UserApi,
 ) *App {
 	engine := gin.New()
@@ -47,6 +48,7 @@ func NewApp(
 		inzoneUserGroupApi: inzoneUserGroupApi,
 		userApi:            userApi,
 		inzoneUserApi:      inzoneUserApi,
+		inzoneApi:          inzoneApi,
 	}
 	return app
 }
@@ -58,6 +60,7 @@ type App struct {
 	userApi            *api.UserApi
 	inzoneUserGroupApi *api.InzoneUserGroupApi
 	inzoneUserApi      *api.InzoneUserApi
+	inzoneApi          *api.InzoneApi
 }
 
 func (a *App) Run() {

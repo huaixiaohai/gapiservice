@@ -19,7 +19,8 @@ func GetAppInstance() (*App, error) {
 	inzoneUserGroupApi := api.NewInzoneUserGroupApi(inzoneUserGroupRepo)
 	inzoneUserRepo := dao.NewInzoneUserRepo()
 	inzoneUserApi := api.NewInzoneUserApi(inzoneUserRepo, inzoneUserGroupRepo)
+	inzoneApi := api.NewInzoneApi(inzoneUserRepo, inzoneUserGroupRepo)
 	userApi := api.NewUserApi()
-	app := NewApp(inzoneUserGroupApi, inzoneUserApi, userApi)
+	app := NewApp(inzoneUserGroupApi, inzoneUserApi, inzoneApi, userApi)
 	return app, nil
 }

@@ -1,8 +1,6 @@
 package api
 
 import (
-	"errors"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 	"github.com/huaixiaohai/gapiservice/dao"
@@ -30,7 +28,7 @@ type InzoneUserApi struct {
 func (a *InzoneUserApi) Create(ctx *gin.Context, req *pb.InzoneUser) (*pb.ID, error) {
 	req.ID = snowflake.MustID()
 	var err error
-	req.UniID, err = getUniID(req)
+	req.UUID, err = pb.GetUUID(req.Name, req.Phone)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +37,7 @@ func (a *InzoneUserApi) Create(ctx *gin.Context, req *pb.InzoneUser) (*pb.ID, er
 
 func (a *InzoneUserApi) Update(ctx *gin.Context, req *pb.InzoneUser) (*pb.Empty, error) {
 	var err error
-	req.UniID, err = getUniID(req)
+	req.UUID, err = pb.GetUUID(req.Name, req.Phone)
 	if err != nil {
 		return nil, err
 	}
@@ -71,23 +69,4 @@ func (a *InzoneUserApi) List(ctx *gin.Context, req *pb.InzoneUserListReq) (*pb.I
 	return &pb.InzoneUserListResp{
 		List: data,
 	}, nil
-}
-
-func getUniID(req *pb.InzoneUser) (string, error) {
-	if len(req.Name) != 6 && len(req.Name) != 9 {
-		return "", errors.New("名称长度不正确")
-	}
-	if len(req.Phone) != 11 {
-		return "", errors.New("手机号长度不正确")
-	}
-
-	var uniID string
-	var na string
-	if len(req.Name) == 6 {
-		na = req.Name[0:3] + "*"
-	} else {
-		na = req.Name[0:3] + "**"
-	}
-	uniID = na + req.Phone[0:3] + "*****" + req.Phone[8:]
-	return uniID, nil
 }

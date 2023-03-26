@@ -19,13 +19,14 @@ var (
 )
 
 type Config struct {
-	RunEnv     string
-	ServerName string
-	Log        *Log
-	Http       *Http
-	Gorm       *Gorm
-	MySQL      *MySQL
-	Cron       *Cron
+	RunEnv         string
+	ServerName     string
+	Log            *Log
+	Http           *Http
+	Gorm           *Gorm
+	MySQL          *MySQL
+	Cron           *Cron
+	CookieUserUUID string
 }
 
 type Cron struct {
