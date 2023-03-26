@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/huaixiaohai/gapiservice/pb"
 
@@ -36,81 +37,87 @@ func (a *GetLuckListJob) GetSpec() string {
 	return config.C.Cron.GetLuckListJob
 }
 
-func (a *GetLuckListJob) Run() {
-	ctx := context.Background()
-
-	i := 0
-	for i < 5 {
-		i++
-		err := func() error {
-			inzoneUser, err := a.userRepo.GetByUUID(ctx, config.C.CookieUserUUID)
-			if err != nil {
-				log.Error(err)
-				return err
-			}
-			var res [][]string
-			res, err = inzone.GetLuckUsers(inzoneUser.Cookie)
-			if err != nil {
-				log.Error(err)
-				return err
-			}
-
-			uuids := make([]string, 0)
-			for _, v := range res {
-				uuids = append(uuids, v...)
-			}
-
-			var inzoneUsers []*pb.InzoneUser
-			inzoneUsers, err = a.userRepo.GetByUUIDs(ctx, uuids)
-
-			inzoneUserM := make(map[string]*pb.InzoneUser)
-			for _, v := range inzoneUsers {
-				inzoneUserM[v.UUID] = v
-			}
-
-			luckInzoneUser := make([][]*pb.InzoneUser, 0)
-			data := make([]*pb.InzoneUser, 0)
-			for _, v := range res {
-				for _, uuid := range v {
-					if inzoneUserM[uuid] != nil {
-						data = append(data, inzoneUserM[uuid])
-					}
-				}
-				luckInzoneUser = append(luckInzoneUser, data)
-			}
-
-			var groups []*pb.InzoneUserGroup
-			groups, err = a.userGroupRepo.List(ctx, &dao.InzoneUserGroupListReq{})
-			if err != nil {
-				log.Error(err)
-				return err
-			}
-
-			for _, group := range groups {
-				go a.pushLuckMsg(group, luckInzoneUser)
-			}
-
-			return nil
-		}()
-		if err != nil {
-			log.Error(fmt.Sprintf("第%d次错误err: ", i), err)
-			break
-		}
-	}
-
+type LuckInzoneUser struct {
+	Label string
+	Users []*pb.InzoneUser
 }
 
-func (a *GetLuckListJob) pushLuckMsg(group *pb.InzoneUserGroup, luckInzoneUser [][]*pb.InzoneUser) {
+func (a *GetLuckListJob) Run() {
+	ctx := context.Background()
+	inzoneUser, err := a.userRepo.GetByUUID(ctx, config.C.CookieUserUUID)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	f := func(getLuck func(cookie string) ([]*inzone.Luck, error)) error {
+		var lucks []*inzone.Luck
+		i := 0
+		for i < 5 {
+			time.Sleep(time.Second)
+			i++
+			lucks, err = getLuck(inzoneUser.Cookie)
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+			break
+		}
+		uuids := make([]string, 0)
+		for _, v := range lucks {
+			uuids = append(uuids, v.UUIDs...)
+		}
+
+		var inzoneUsers []*pb.InzoneUser
+		inzoneUsers, err = a.userRepo.GetByUUIDs(ctx, uuids)
+
+		inzoneUserM := make(map[string]*pb.InzoneUser)
+		for _, v := range inzoneUsers {
+			inzoneUserM[v.UUID] = v
+		}
+
+		luckInzoneUsers := make([]*LuckInzoneUser, 0)
+		data := make([]*pb.InzoneUser, 0)
+		for _, v := range lucks {
+			for _, uuid := range v.UUIDs {
+				if inzoneUserM[uuid] != nil {
+					data = append(data, inzoneUserM[uuid])
+				}
+			}
+			luckInzoneUsers = append(luckInzoneUsers, &LuckInzoneUser{
+				Label: v.Label,
+				Users: data,
+			})
+		}
+
+		var groups []*pb.InzoneUserGroup
+		groups, err = a.userGroupRepo.List(ctx, &dao.InzoneUserGroupListReq{})
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+
+		for _, group := range groups {
+			go a.pushLuckMsg(group, luckInzoneUsers)
+		}
+		return nil
+	}
+
+	_ = f(inzone.GetDailyLuckUsers)
+	//_ = f(inzone.GetSeriesLuckUsers)
+}
+
+func (a *GetLuckListJob) pushLuckMsg(group *pb.InzoneUserGroup, luckInzoneUsers []*LuckInzoneUser) {
 	text := fmt.Sprintf("今日消息\n")
-	for k, v := range luckInzoneUser {
-		label := "每日"
-		if k > 0 {
-			label = fmt.Sprintf("系列%d", k)
+	for _, v := range luckInzoneUsers {
+		count := 0
+		for _, user := range v.Users {
+			if user.GroupID == group.ID {
+				text += "   " + user.Name + "  " + user.Phone + "  " + user.Remark + "\n"
+				count++
+			}
 		}
-		text += fmt.Sprintf("%s  (%d人)\n", label, len(v))
-		for _, user := range v {
-			text += "   " + user.Name + "  " + user.Phone + "  " + user.Remark + "\n"
-		}
+		text = fmt.Sprintf("%s  (%d人)\n", v.Label, count) + text
 	}
 	log.Println(group.Name)
 	log.Println(text)

@@ -8,28 +8,31 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/huaixiaohai/gapiservice/pb"
-
 	"github.com/PuerkitoBio/goquery"
 )
 
-func GetLuckUsers(cookie string) ([][]string, error) {
-	dailyLuck, err := getDailyLuckUsers(cookie)
-	if err != nil {
-		return nil, err
-	}
-	seriesLuck, err := getSeriesLuckUsers(cookie)
-	if err != nil {
-		return nil, err
-	}
-	res := make([][]string, 0)
-	res = append(res, dailyLuck)
-	res = append(res, seriesLuck...)
-	return res, nil
+//func GetLuckUsers(cookie string) ([][]string, error) {
+//	dailyLuck, err := getDailyLuckUsers(cookie)
+//	if err != nil {
+//		return nil, err
+//	}
+//	seriesLuck, err := getSeriesLuckUsers(cookie)
+//	if err != nil {
+//		return nil, err
+//	}
+//	res := make([][]string, 0)
+//	res = append(res, dailyLuck)
+//	res = append(res, seriesLuck...)
+//	return res, nil
+//}
+
+type Luck struct {
+	Label string
+	UUIDs []string
 }
 
 // GetDailyLuckUsers 获取每日获奖名单那
-func getDailyLuckUsers(cookie string) ([]string, error) {
+func GetDailyLuckUsers(cookie string) ([]*Luck, error) {
 	buf, err := query("http://wx0.yinzuo.cn/index.php/MaoTCT/luckshow.html", cookie)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -41,20 +44,24 @@ func getDailyLuckUsers(cookie string) ([]string, error) {
 		fmt.Println(err.Error())
 		return nil, err
 	}
-	res := make([]string, 0)
+	uuids := make([]string, 0)
 	doc.Find(".luckyLists").Find(".theLists").Find(".uf").Each(func(i int, s *goquery.Selection) {
-		uuid, _ := pb.GetUUID(strings.ReplaceAll(s.Children().First().Text(), " ", ""), strings.ReplaceAll(s.Children().Last().Text(), " ", ""))
-		res = append(res, uuid)
+		uuid := nameFormat(s.Children().First().Text()) + strings.ReplaceAll(s.Children().Last().Text(), " ", "")
+		uuids = append(uuids, uuid)
 	})
-	if len(res) <= 0 {
+	if len(uuids) <= 0 {
 		return nil, errors.New("名单还未公布")
 	}
 
+	res := []*Luck{{
+		Label: "每日",
+		UUIDs: uuids,
+	}}
 	return res, nil
 }
 
 // GetSeriesLuckUsers 获取每日获奖名单那
-func getSeriesLuckUsers(cookie string) ([][]string, error) {
+func GetSeriesLuckUsers(cookie string) ([]*Luck, error) {
 	buf, err := query("http://wx0.yinzuo.cn/index.php/MaoTCTx/luckshow.html", cookie)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -66,26 +73,22 @@ func getSeriesLuckUsers(cookie string) ([][]string, error) {
 		fmt.Println(err.Error())
 		return nil, err
 	}
-	res := make([][]string, 0)
+	res := make([]*Luck, 0)
 	doc.Find(".hasLuckys").Children().Each(func(i int, s *goquery.Selection) {
-		if res[i] == nil {
-			res[i] = make([]string, 0)
+		luck := &Luck{
+			Label: fmt.Sprintf("系列%d", i),
+			UUIDs: make([]string, 0),
 		}
 		s.Find(".luckyLists").Find(".theLists").Find(".uf").Each(func(i int, s *goquery.Selection) {
-			uuid, _ := pb.GetUUID(strings.ReplaceAll(s.Children().First().Text(), " ", ""), strings.ReplaceAll(s.Children().Last().Text(), " ", ""))
-			res[i] = append(res[i], uuid)
+			uuid := nameFormat(s.Children().First().Text()) + strings.ReplaceAll(s.Children().Last().Text(), " ", "")
+			luck.UUIDs = append(luck.UUIDs, uuid)
 		})
+		res = append(res, luck)
 	})
 
 	if len(res) <= 0 {
 		return nil, errors.New("系列名单还未公布")
 	}
-	for _, v := range res {
-		if len(v) <= 0 {
-			return nil, errors.New("系列名单还未公布")
-		}
-	}
-
 	return res, nil
 }
 
@@ -120,4 +123,10 @@ func query(url string, cookie string) ([]byte, error) {
 		return nil, err
 	}
 	return buf, nil
+}
+
+func nameFormat(str string) string {
+	str = strings.ReplaceAll(str, " ", "")
+	str = strings.ReplaceAll(str, " ", "")
+	return str
 }
