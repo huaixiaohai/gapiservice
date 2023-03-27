@@ -104,7 +104,7 @@ func (a *GetLuckListJob) Run() {
 	}
 
 	_ = f(inzone.GetDailyLuckUsers)
-	//_ = f(inzone.GetSeriesLuckUsers)
+	_ = f(inzone.GetSeriesLuckUsers)
 }
 
 func (a *GetLuckListJob) pushLuckMsg(group *pb.InzoneUserGroup, luckInzoneUsers []*LuckInzoneUser) {

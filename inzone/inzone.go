@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/huaixiaohai/lib/log"
+
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -26,9 +28,28 @@ import (
 //	return res, nil
 //}
 
+var InvalidInzoneCookieErr = errors.New("无效的inzone cookie")
+
 type Luck struct {
 	Label string
 	UUIDs []string
+}
+
+func IsValid(cookie string) bool {
+	_, err := GetIndex(cookie)
+	if err != nil {
+		log.Error("cookie失效", err.Error())
+	}
+	return err == nil
+}
+
+func GetIndex(cookie string) ([]byte, error) {
+	buf, err := query("http://wx0.yinzuo.cn/index.php/MaoTCT/Index.html", cookie)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+	return buf, err
 }
 
 // GetDailyLuckUsers 获取每日获奖名单那
@@ -117,6 +138,11 @@ func query(url string, cookie string) ([]byte, error) {
 	defer func() {
 		_ = resp.Body.Close()
 	}()
+
+	if strings.Contains(resp.Request.URL.String(), "open.weixin.qq.com") {
+		return nil, InvalidInzoneCookieErr
+	}
+
 	var buf []byte
 	buf, err = ioutil.ReadAll(resp.Body)
 	if err != nil {

@@ -30,7 +30,8 @@ type Config struct {
 }
 
 type Cron struct {
-	GetLuckListJob string
+	GetLuckListJob   string
+	RefreshCookieJob string
 }
 
 type Log struct {

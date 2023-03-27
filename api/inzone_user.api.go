@@ -1,6 +1,13 @@
 package api
 
 import (
+	"context"
+	"time"
+
+	"github.com/huaixiaohai/gapiservice/inzone"
+
+	"github.com/huaixiaohai/lib/log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 	"github.com/huaixiaohai/gapiservice/dao"
@@ -14,10 +21,13 @@ func NewInzoneUserApi(
 	userRepo *dao.InzoneUserRepo,
 	userGroupRepo *dao.InzoneUserGroupRepo,
 ) *InzoneUserApi {
-	return &InzoneUserApi{
+	ins := &InzoneUserApi{
 		userRepo:      userRepo,
 		userGroupRepo: userGroupRepo,
 	}
+
+	go ins.refreshCookie(context.Background())
+	return ins
 }
 
 type InzoneUserApi struct {
@@ -32,6 +42,14 @@ func (a *InzoneUserApi) Create(ctx *gin.Context, req *pb.InzoneUser) (*pb.ID, er
 	if err != nil {
 		return nil, err
 	}
+
+	if inzone.IsValid(req.Cookie) {
+		req.CookieRefreshAt = time.Now().Local().Unix()
+		req.CookieStatus = pb.ECookieStatusValid
+	} else {
+		req.CookieStatus = pb.ECookieStatusInvalid
+	}
+
 	return &pb.ID{ID: req.ID}, a.userRepo.Create(ctx, req)
 }
 
@@ -41,6 +59,14 @@ func (a *InzoneUserApi) Update(ctx *gin.Context, req *pb.InzoneUser) (*pb.Empty,
 	if err != nil {
 		return nil, err
 	}
+
+	if inzone.IsValid(req.Cookie) {
+		req.CookieRefreshAt = time.Now().Local().Unix()
+		req.CookieStatus = pb.ECookieStatusValid
+	} else {
+		req.CookieStatus = pb.ECookieStatusInvalid
+	}
+
 	return &pb.Empty{}, a.userRepo.Update(ctx, req)
 }
 
@@ -70,3 +96,43 @@ func (a *InzoneUserApi) List(ctx *gin.Context, req *pb.InzoneUserListReq) (*pb.I
 		List: data,
 	}, nil
 }
+
+// 刷新cookie
+func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
+	sleepTime := time.Second
+	for {
+		time.Sleep(sleepTime)
+		count, err := a.userRepo.Count(ctx, &dao.InzoneUserListReq{})
+		if err != nil {
+			log.Error(err)
+			sleepTime = time.Second
+			continue
+		}
+		if count == 0 {
+			sleepTime = time.Minute
+			continue
+		}
+		n := count/3600 + 1
+		sleepTime = time.Millisecond * time.Duration(1000/n)
+
+		inzoneUser, err := a.userRepo.GetLRUCookieUser(ctx)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		if inzoneUser == nil {
+			continue
+		}
+		cookieStatus := pb.ECookieStatusInvalid
+		if inzone.IsValid(inzoneUser.Cookie) {
+			cookieStatus = pb.ECookieStatusValid
+		}
+		err = a.userRepo.UpdateCookie(ctx, inzoneUser.ID, cookieStatus)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+	}
+}
+
+//func (a *InzoneUserApi) RefreshCookie

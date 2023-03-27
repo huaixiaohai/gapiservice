@@ -3,14 +3,16 @@ package pb
 import "errors"
 
 type InzoneUser struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Phone     string `json:"phone"`
-	Remark    string `json:"remark"`
-	GroupID   string `json:"group_id"`
-	GroupName string `json:"group_name"`
-	Cookie    string `json:"cookie"`
-	UUID      string `json:"uuid"`
+	ID              string        `json:"id"`
+	Name            string        `json:"name"`
+	Phone           string        `json:"phone"`
+	Remark          string        `json:"remark"`
+	GroupID         string        `json:"group_id"`
+	GroupName       string        `json:"group_name"`
+	Cookie          string        `json:"cookie"`
+	CookieRefreshAt int64         `json:"cookie_refresh_at"`
+	CookieStatus    ECookieStatus `json:"cookie_status"`
+	UUID            string        `json:"uuid"`
 }
 
 type InzoneUserListReq struct {

@@ -1,15 +1,21 @@
 package model
 
-import "github.com/huaixiaohai/gapiservice/pb"
+import (
+	"time"
+
+	"github.com/huaixiaohai/gapiservice/pb"
+)
 
 type InzoneUser struct {
 	Model
-	Name    string `gorm:"type:varchar(30)"`
-	Phone   string `gorm:"type:varchar(30)"`
-	Remark  string
-	GroupID string
-	Cookie  string
-	UUID    string `gorm:"uuid;type:varchar(30);uniqueIndex"`
+	Name            string `gorm:"type:varchar(30)"`
+	Phone           string `gorm:"type:varchar(30)"`
+	Remark          string
+	GroupID         string
+	Cookie          string
+	CookieRefreshAt time.Time
+	CookieStatus    pb.ECookieStatus
+	UUID            string `gorm:"uuid;type:varchar(30);uniqueIndex"`
 }
 
 func InzoneUserFrom(one *pb.InzoneUser) *InzoneUser {
@@ -21,12 +27,14 @@ func InzoneUserFrom(one *pb.InzoneUser) *InzoneUser {
 		Model: Model{
 			ID: one.ID,
 		},
-		Name:    one.Name,
-		Phone:   one.Phone,
-		Remark:  one.Remark,
-		GroupID: one.GroupID,
-		Cookie:  one.Cookie,
-		UUID:    one.UUID,
+		Name:            one.Name,
+		Phone:           one.Phone,
+		Remark:          one.Remark,
+		GroupID:         one.GroupID,
+		Cookie:          one.Cookie,
+		CookieStatus:    one.CookieStatus,
+		UUID:            one.UUID,
+		CookieRefreshAt: time.Unix(one.CookieRefreshAt, 0),
 	}
 }
 
@@ -36,13 +44,15 @@ func InzoneUserTo(one *InzoneUser) *pb.InzoneUser {
 	}
 
 	return &pb.InzoneUser{
-		ID:      one.ID,
-		Name:    one.Name,
-		Phone:   one.Phone,
-		Remark:  one.Remark,
-		GroupID: one.GroupID,
-		Cookie:  one.Cookie,
-		UUID:    one.UUID,
+		ID:              one.ID,
+		Name:            one.Name,
+		Phone:           one.Phone,
+		Remark:          one.Remark,
+		GroupID:         one.GroupID,
+		Cookie:          one.Cookie,
+		CookieStatus:    one.CookieStatus,
+		UUID:            one.UUID,
+		CookieRefreshAt: one.CookieRefreshAt.Local().Unix(),
 	}
 }
 
