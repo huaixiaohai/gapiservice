@@ -16,6 +16,12 @@ type InzoneUser struct {
 }
 
 type InzoneUserListReq struct {
+	PageSize     int64         `json:"page_size" form:"page_size"`
+	PageIndex    int64         `json:"page_index" form:"page_index"`
+	Name         string        `json:"name" form:"name"`
+	Phone        string        `json:"phone" form:"phone"`
+	GroupID      string        `json:"group_id" form:"group_id"`
+	CookieStatus ECookieStatus `json:"cookie_status" form:"cookie_status"`
 }
 
 type InzoneUserListResp struct {

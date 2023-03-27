@@ -80,11 +80,12 @@ func (a *InzoneUserRepo) GetByUUIDs(ctx context.Context, uuids []string) ([]*pb.
 }
 
 type InzoneUserListReq struct {
-	PageSize  int64
-	PageIndex int64
-	Name      string
-	Phone     string
-	GroupID   uint64
+	PageSize     int64
+	PageIndex    int64
+	Name         string
+	Phone        string
+	GroupID      string
+	CookieStatus pb.ECookieStatus
 }
 
 // List 返回任务列表，按照优先级排序
@@ -109,6 +110,12 @@ func (a *InzoneUserRepo) listReq(ctx context.Context, req *InzoneUserListReq) *g
 	}
 	if req.Name != "" {
 		s.Where("phone like ?", "%"+req.Phone+"%")
+	}
+	if req.GroupID != "" {
+		s.Where("group_id = ?", req.GroupID)
+	}
+	if req.CookieStatus != pb.ECookieStatusNone {
+		s.Where("cookie_status = ?", req.CookieStatus)
 	}
 	return s.Order("id desc").Limit(int(req.PageSize)).Offset(int((req.PageIndex - 1) * req.PageSize))
 }

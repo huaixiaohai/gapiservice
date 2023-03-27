@@ -79,7 +79,14 @@ func (a *InzoneUserApi) Get(ctx *gin.Context, req *pb.ID) (*pb.InzoneUser, error
 }
 
 func (a *InzoneUserApi) List(ctx *gin.Context, req *pb.InzoneUserListReq) (*pb.InzoneUserListResp, error) {
-	data, err := a.userRepo.List(ctx, &dao.InzoneUserListReq{})
+	data, err := a.userRepo.List(ctx, &dao.InzoneUserListReq{
+		PageSize:     req.PageSize,
+		PageIndex:    req.PageIndex,
+		Name:         req.Name,
+		Phone:        req.Phone,
+		GroupID:      req.GroupID,
+		CookieStatus: req.CookieStatus,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -99,6 +106,7 @@ func (a *InzoneUserApi) List(ctx *gin.Context, req *pb.InzoneUserListReq) (*pb.I
 
 // 刷新cookie
 func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
+	return
 	sleepTime := time.Second
 	for {
 		time.Sleep(sleepTime)
