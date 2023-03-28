@@ -60,7 +60,7 @@ func GetCID(cookie string) (string, error) {
 		return "", errors.New("CID 查找不到")
 	}
 	cid := strings.ReplaceAll(context, "CID:", "")
-	cid = strings.ReplaceAll(context, " ", "")
+	cid = strings.ReplaceAll(cid, " ", "")
 
 	return cid, nil
 }
