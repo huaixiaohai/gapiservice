@@ -59,7 +59,10 @@ func GetCID(cookie string) (string, error) {
 	if !strings.Contains(context, "CID: ") {
 		return "", errors.New("CID 查找不到")
 	}
-	return strings.ReplaceAll(context, "CID: ", ""), nil
+	cid := strings.ReplaceAll(context, "CID:", "")
+	cid = strings.ReplaceAll(context, " ", "")
+
+	return cid, nil
 }
 
 func GetIndex(cookie string) ([]byte, error) {
