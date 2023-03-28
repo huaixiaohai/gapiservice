@@ -2,6 +2,9 @@ package dao
 
 import (
 	"context"
+	"time"
+
+	"github.com/huaixiaohai/lib/log"
 
 	"github.com/google/wire"
 	"github.com/huaixiaohai/gapiservice/dao/model"
@@ -79,9 +82,12 @@ func (a *InzoneUserRepo) GetByUUIDs(ctx context.Context, uuids []string) ([]*pb.
 }
 
 type InzoneUserListReq struct {
-	PageSize  int64
-	PageIndex int64
-	Name      string
+	PageSize     int64
+	PageIndex    int64
+	Name         string
+	Phone        string
+	GroupID      string
+	CookieStatus pb.ECookieStatus
 }
 
 // List 返回任务列表，按照优先级排序
@@ -104,5 +110,63 @@ func (a *InzoneUserRepo) listReq(ctx context.Context, req *InzoneUserListReq) *g
 	if req.Name != "" {
 		s.Where("name like ?", "%"+req.Name+"%")
 	}
+	if req.Name != "" {
+		s.Where("phone like ?", "%"+req.Phone+"%")
+	}
+	if req.GroupID != "" {
+		s.Where("group_id = ?", req.GroupID)
+	}
+	if req.CookieStatus != pb.ECookieStatusNone {
+		s.Where("cookie_status = ?", req.CookieStatus)
+	}
 	return s.Order("id desc").Limit(int(req.PageSize)).Offset(int((req.PageIndex - 1) * req.PageSize))
+}
+
+//func (a *InzoneUserRepo) GetUsers(ctx context.Context) ([]*pb.InzoneUser, error) {
+//	records := make([]*model.InzoneUser, 0)
+//	err := getSession(ctx).Model(&model.InzoneUser{}).Where("? - UNIX_TIMESTAMP(refresh_cookie_at) > ?", time.Now().Local().Unix(), 2400).Find(&records).Error
+//	if err == gorm.ErrRecordNotFound {
+//		return nil, nil
+//	}
+//	if err != nil {
+//		return nil, err
+//	}
+//	return model.InzoneUserListTo(records), nil
+//}
+
+func (a *InzoneUserRepo) GetIDsByCookieStatus(ctx context.Context, cookieStatus pb.ECookieStatus) ([]string, error) {
+	ids := make([]string, 0)
+	err := getSession(ctx).Model(&model.InzoneUser{}).Select("id").Where("cookie_status=?", cookieStatus).Find(&ids).Error
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	return ids, err
+}
+
+func (a *InzoneUserRepo) GetLRUCookieUser(ctx context.Context) (*pb.InzoneUser, error) {
+	one := &model.InzoneUser{}
+	err := getSession(ctx).Model(&model.InzoneUser{}).Where("cookie_status=?", pb.ECookieStatusValid).Order("cookie_refresh_at").First(one).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return model.InzoneUserTo(one), nil
+}
+
+func (a *InzoneUserRepo) UpdateCookie(ctx context.Context, cid string, cookie string, cookieStatus pb.ECookieStatus) error {
+	if cookieStatus == pb.ECookieStatusValid {
+		err := getSession(ctx).Model(&model.InzoneUser{}).Where("cid=?", cid).Updates(map[string]interface{}{"cookie_refresh_at": time.Now().Local(), "cookie_status": cookieStatus, "cookie": cookie}).Error
+		if err != nil {
+			return err
+		}
+	} else {
+		err := getSession(ctx).Model(&model.InzoneUser{}).Where("cid=?", cid).Updates(map[string]interface{}{"cookie_status": pb.ECookieStatusInvalid}).Error
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

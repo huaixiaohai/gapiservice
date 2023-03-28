@@ -9,3 +9,11 @@ const (
 	EGoodsTypeSeries3 EGoodsType = "系列3"
 	EGoodsTypeSeries4 EGoodsType = "系列4"
 )
+
+type ECookieStatus int8
+
+const (
+	ECookieStatusNone    ECookieStatus = iota
+	ECookieStatusValid   ECookieStatus = 1
+	ECookieStatusInvalid ECookieStatus = 2
+)
