@@ -156,9 +156,9 @@ func (a *InzoneUserRepo) GetLRUCookieUser(ctx context.Context) (*pb.InzoneUser, 
 	return model.InzoneUserTo(one), nil
 }
 
-func (a *InzoneUserRepo) UpdateCookie(ctx context.Context, cid string, cookieStatus pb.ECookieStatus) error {
+func (a *InzoneUserRepo) UpdateCookie(ctx context.Context, cid string, cookie string, cookieStatus pb.ECookieStatus) error {
 	if cookieStatus == pb.ECookieStatusValid {
-		err := getSession(ctx).Model(&model.InzoneUser{}).Where("cid=?", cid).Updates(map[string]interface{}{"cookie_refresh_at": time.Now().Local()}).Error
+		err := getSession(ctx).Model(&model.InzoneUser{}).Where("cid=?", cid).Updates(map[string]interface{}{"cookie_refresh_at": time.Now().Local(), "cookie_status": cookieStatus, "cookie": cookie}).Error
 		if err != nil {
 			return err
 		}

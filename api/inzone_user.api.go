@@ -116,7 +116,7 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 		log.Error(err.Error())
 		return nil, err
 	}
-	err = a.userRepo.UpdateCookie(ctx, cid, pb.ECookieStatusValid)
+	err = a.userRepo.UpdateCookie(ctx, cid, cookie.String(), pb.ECookieStatusValid)
 	if err != nil {
 		log.Error(err.Error())
 		return nil, err
@@ -154,7 +154,7 @@ func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
 			if inzone.IsValid(inzoneUser.Cookie) {
 				cookieStatus = pb.ECookieStatusValid
 			}
-			err = a.userRepo.UpdateCookie(ctx, inzoneUser.CID, cookieStatus)
+			err = a.userRepo.UpdateCookie(ctx, inzoneUser.CID, inzoneUser.Cookie, cookieStatus)
 			if err != nil {
 				log.Error(err)
 				continue
