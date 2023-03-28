@@ -106,41 +106,42 @@ func (a *InzoneUserApi) List(ctx *gin.Context, req *pb.InzoneUserListReq) (*pb.I
 
 // 刷新cookie
 func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
-	return
 	sleepTime := time.Second
 	for {
 		time.Sleep(sleepTime)
-		count, err := a.userRepo.Count(ctx, &dao.InzoneUserListReq{})
+		startTime := time.Now().Local().Unix()
+		ids, err := a.userRepo.GetIDsByCookieStatus(ctx, pb.ECookieStatusValid)
 		if err != nil {
 			log.Error(err)
-			sleepTime = time.Second
-			continue
-		}
-		if count == 0 {
 			sleepTime = time.Minute
 			continue
 		}
-		n := count/3600 + 1
-		sleepTime = time.Millisecond * time.Duration(1000/n)
+		if len(ids) <= 0 {
+			sleepTime = time.Minute
+			continue
+		}
 
-		inzoneUser, err := a.userRepo.GetLRUCookieUser(ctx)
-		if err != nil {
-			log.Error(err)
-			continue
+		for _, id := range ids {
+			inzoneUser, err := a.userRepo.Get(ctx, id)
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+			if inzoneUser == nil {
+				continue
+			}
+			cookieStatus := pb.ECookieStatusInvalid
+			if inzone.IsValid(inzoneUser.Cookie) {
+				cookieStatus = pb.ECookieStatusValid
+			}
+			err = a.userRepo.UpdateCookie(ctx, inzoneUser.ID, cookieStatus)
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+			time.Sleep(time.Millisecond * 300)
 		}
-		if inzoneUser == nil {
-			continue
-		}
-		cookieStatus := pb.ECookieStatusInvalid
-		if inzone.IsValid(inzoneUser.Cookie) {
-			cookieStatus = pb.ECookieStatusValid
-		}
-		err = a.userRepo.UpdateCookie(ctx, inzoneUser.ID, cookieStatus)
-		if err != nil {
-			log.Error(err)
-			continue
-		}
+		println(startTime + 2400 - time.Now().Local().Unix())
+		sleepTime = time.Duration(startTime+3000-time.Now().Local().Unix()) * time.Second
 	}
 }
-
-//func (a *InzoneUserApi) RefreshCookie
