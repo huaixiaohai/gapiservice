@@ -12,6 +12,7 @@ type InzoneUser struct {
 	Phone           string `gorm:"type:varchar(30)"`
 	Remark          string
 	GroupID         string
+	CID             string `gorm:"cid;type:varchar(50);uniqueIndex"`
 	Cookie          string
 	CookieRefreshAt time.Time
 	CookieStatus    pb.ECookieStatus
@@ -35,6 +36,7 @@ func InzoneUserFrom(one *pb.InzoneUser) *InzoneUser {
 		CookieStatus:    one.CookieStatus,
 		UUID:            one.UUID,
 		CookieRefreshAt: time.Unix(one.CookieRefreshAt, 0),
+		CID:             one.CID,
 	}
 }
 
@@ -53,6 +55,7 @@ func InzoneUserTo(one *InzoneUser) *pb.InzoneUser {
 		CookieStatus:    one.CookieStatus,
 		UUID:            one.UUID,
 		CookieRefreshAt: one.CookieRefreshAt.Local().Unix(),
+		CID:             one.CID,
 	}
 }
 

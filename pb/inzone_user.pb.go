@@ -13,6 +13,7 @@ type InzoneUser struct {
 	CookieRefreshAt int64         `json:"cookie_refresh_at"`
 	CookieStatus    ECookieStatus `json:"cookie_status"`
 	UUID            string        `json:"uuid"`
+	CID             string        `json:"cid"`
 }
 
 type InzoneUserListReq struct {

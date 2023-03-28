@@ -104,6 +104,26 @@ func (a *InzoneUserApi) List(ctx *gin.Context, req *pb.InzoneUserListReq) (*pb.I
 	}, nil
 }
 
+func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty, error) {
+	cookie, err := ctx.Request.Cookie("PHPSESSID")
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
+	var cid string
+	cid, err = inzone.GetCID(cookie.String())
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
+	err = a.userRepo.UpdateCookie(ctx, cid, pb.ECookieStatusValid)
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
+	return &pb.Empty{}, nil
+}
+
 // 刷新cookie
 func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
 	sleepTime := time.Second
@@ -134,7 +154,7 @@ func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
 			if inzone.IsValid(inzoneUser.Cookie) {
 				cookieStatus = pb.ECookieStatusValid
 			}
-			err = a.userRepo.UpdateCookie(ctx, inzoneUser.ID, cookieStatus)
+			err = a.userRepo.UpdateCookie(ctx, inzoneUser.CID, cookieStatus)
 			if err != nil {
 				log.Error(err)
 				continue

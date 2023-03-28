@@ -43,6 +43,25 @@ func IsValid(cookie string) bool {
 	return err == nil
 }
 
+func GetCID(cookie string) (string, error) {
+	buf, err := query("http://wx0.yinzuo.cn/index.php/MaoTCT/indexnew.html", cookie)
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+	var doc *goquery.Document
+	doc, err = goquery.NewDocumentFromReader(bytes.NewBuffer(buf))
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+	context := doc.Find(".uf.uf-ac.bottomData").Find(".uf.uf-f1.uf-col.uf-as.leftCon").Find(".uf.uf-pc.uf-f1.bottomDataLine").Text()
+	if !strings.Contains(context, "CID: ") {
+		return "", errors.New("CID 查找不到")
+	}
+	return strings.ReplaceAll(context, "CID: ", ""), nil
+}
+
 func GetIndex(cookie string) ([]byte, error) {
 	buf, err := query("http://wx0.yinzuo.cn/index.php/MaoTCT/Index.html", cookie)
 	if err != nil {
@@ -123,7 +142,7 @@ func query(url string, cookie string) ([]byte, error) {
 	req.Header.Set("Upgrade-Insecure-Requests", "1")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36 NetType/WIFI MicroMessenger/7.0.20.1781(0x6700143B) WindowsWechat(0x6309001c) XWEB/6500")
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-	req.Header.Set("Referer", "http://wx0.yinzuo.cn/index.php/MaoTCT/indexnew.html")
+	//req.Header.Set("Referer", "http://wx0.yinzuo.cn/index.php/MaoTCT/indexnew.html")
 	//req.Header.Set("Accept-Encoding", "gzip, deflate")
 	req.Header.Set("Accept-Language", "zh-CN,zh")
 	req.Header.Set("Connection", "keep-alive")
