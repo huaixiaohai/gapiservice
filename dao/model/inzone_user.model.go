@@ -12,7 +12,7 @@ type InzoneUser struct {
 	Phone           string `gorm:"type:varchar(30)"`
 	Remark          string
 	GroupID         string
-	CID             string `gorm:"cid;type:varchar(50);uniqueIndex"`
+	CID             string `gorm:"column:cid;type:varchar(50);uniqueIndex"`
 	Cookie          string
 	CookieRefreshAt time.Time
 	CookieStatus    pb.ECookieStatus
