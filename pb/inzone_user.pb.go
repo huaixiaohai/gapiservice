@@ -26,7 +26,8 @@ type InzoneUserListReq struct {
 }
 
 type InzoneUserListResp struct {
-	List []*InzoneUser `json:"list"`
+	List  []*InzoneUser `json:"list"`
+	Total int64         `json:"total"`
 }
 
 func GetUUID(name, phone string) (string, error) {

@@ -21,10 +21,10 @@ Gorm:
   EnableAutoMigrate: true # 是否启用自动映射数据库表结构
 
 MySQL:
-  Host: "192.168.12.198" # 连接地址
+  Host: "192.168.1.6" # 连接地址
   Port: 3306 # 连接端口
   User: "root" # 用户名
-  Password: "123456" # 密码
+  Password: "root123" # 密码
   DBName: "inzone" # 数据库
   Parameters: "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true" # 连接参数
 

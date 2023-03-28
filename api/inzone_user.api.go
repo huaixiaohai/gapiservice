@@ -43,29 +43,29 @@ func (a *InzoneUserApi) Create(ctx *gin.Context, req *pb.InzoneUser) (*pb.ID, er
 		return nil, err
 	}
 
-	if inzone.IsValid(req.Cookie) {
-		req.CookieRefreshAt = time.Now().Local().Unix()
-		req.CookieStatus = pb.ECookieStatusValid
-	} else {
-		req.CookieStatus = pb.ECookieStatusInvalid
-	}
+	req.CookieStatus = pb.ECookieStatusInvalid
 
 	return &pb.ID{ID: req.ID}, a.userRepo.Create(ctx, req)
 }
 
 func (a *InzoneUserApi) Update(ctx *gin.Context, req *pb.InzoneUser) (*pb.Empty, error) {
-	var err error
-	req.UUID, err = pb.GetUUID(req.Name, req.Phone)
+	user, err := a.userRepo.Get(ctx, req.ID)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return &pb.Empty{}, nil
+	}
+
+	user.UUID, err = pb.GetUUID(req.Name, req.Phone)
 	if err != nil {
 		return nil, err
 	}
 
-	if inzone.IsValid(req.Cookie) {
-		req.CookieRefreshAt = time.Now().Local().Unix()
-		req.CookieStatus = pb.ECookieStatusValid
-	} else {
-		req.CookieStatus = pb.ECookieStatusInvalid
-	}
+	user.Name = req.Name
+	user.GroupID = req.GroupID
+	user.Phone = req.Phone
+	user.CID = req.CID
 
 	return &pb.Empty{}, a.userRepo.Update(ctx, req)
 }
@@ -79,14 +79,21 @@ func (a *InzoneUserApi) Get(ctx *gin.Context, req *pb.ID) (*pb.InzoneUser, error
 }
 
 func (a *InzoneUserApi) List(ctx *gin.Context, req *pb.InzoneUserListReq) (*pb.InzoneUserListResp, error) {
-	data, err := a.userRepo.List(ctx, &dao.InzoneUserListReq{
-		PageSize:     req.PageSize,
-		PageIndex:    req.PageIndex,
+
+	daoReq := &dao.InzoneUserListReq{
 		Name:         req.Name,
 		Phone:        req.Phone,
 		GroupID:      req.GroupID,
 		CookieStatus: req.CookieStatus,
-	})
+	}
+	total, err := a.userRepo.Count(ctx, daoReq)
+	if err != nil {
+		return nil, err
+	}
+
+	daoReq.PageSize = req.PageSize
+	daoReq.PageIndex = req.PageIndex
+	data, err := a.userRepo.List(ctx, daoReq)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +107,8 @@ func (a *InzoneUserApi) List(ctx *gin.Context, req *pb.InzoneUserListReq) (*pb.I
 		}
 	}
 	return &pb.InzoneUserListResp{
-		List: data,
+		List:  data,
+		Total: total,
 	}, nil
 }
 
