@@ -49,6 +49,9 @@ func (a *GetLuckListJob) Run() {
 		log.Error(err)
 		return
 	}
+	if inzoneUser == nil {
+		return
+	}
 
 	f := func(getLuck func(cookie string) ([]*inzone.Luck, error)) error {
 		var lucks []*inzone.Luck
