@@ -124,6 +124,20 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 		log.Error(err.Error())
 		return nil, err
 	}
+	a.userRepo.Create(ctx, &pb.InzoneUser{
+		ID:              snowflake.MustID(),
+		Name:            snowflake.MustID(),
+		Phone:           "",
+		Remark:          "",
+		GroupID:         "",
+		GroupName:       "",
+		Cookie:          cookie.String(),
+		CookieRefreshAt: time.Now().Local().Unix(),
+		CookieStatus:    pb.ECookieStatusValid,
+		UUID:            snowflake.MustID(),
+		CID:             cid,
+	})
+
 	err = a.userRepo.UpdateCookie(ctx, cid, cookie.String(), pb.ECookieStatusValid)
 	if err != nil {
 		log.Error(err.Error())
