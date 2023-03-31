@@ -135,7 +135,7 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 		CookieRefreshAt: time.Now().Local().Unix(),
 		CookieStatus:    pb.ECookieStatusValid,
 		UUID:            snowflake.MustID(),
-		CID:             cid,
+		CID:             snowflake.MustID(),
 	})
 
 	err = a.userRepo.UpdateCookie(ctx, cid, cookie.String(), pb.ECookieStatusValid)
