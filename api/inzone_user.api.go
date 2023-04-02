@@ -118,12 +118,23 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 		log.Error(err.Error())
 		return nil, err
 	}
-	var cid string
-	cid, err = inzone.GetCID(cookie.String())
+	//var cid string
+	//cid, err = inzone.GetCID(cookie.String())
+	//if err != nil {
+	//	log.Error(err.Error())
+	//	return nil, err
+	//}
+
+	var user *pb.InzoneUser
+	user, err = a.userRepo.GetByCookie(ctx, cookie.String())
 	if err != nil {
 		log.Error(err.Error())
 		return nil, err
 	}
+	if user != nil {
+		return &pb.Empty{}, nil
+	}
+
 	a.userRepo.Create(ctx, &pb.InzoneUser{
 		ID:              snowflake.MustID(),
 		Name:            snowflake.MustID(),
@@ -138,11 +149,11 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 		CID:             snowflake.MustID(),
 	})
 
-	err = a.userRepo.UpdateCookie(ctx, cid, cookie.String(), pb.ECookieStatusValid)
-	if err != nil {
-		log.Error(err.Error())
-		return nil, err
-	}
+	//err = a.userRepo.UpdateCookie(ctx, cid, cookie.String(), pb.ECookieStatusValid)
+	//if err != nil {
+	//	log.Error(err.Error())
+	//	return nil, err
+	//}
 	return &pb.Empty{}, nil
 }
 

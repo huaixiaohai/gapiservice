@@ -57,6 +57,18 @@ func (a *InzoneUserRepo) Get(ctx context.Context, id string) (*pb.InzoneUser, er
 	return model.InzoneUserTo(one), nil
 }
 
+func (a *InzoneUserRepo) GetByCookie(ctx context.Context, cookie string) (*pb.InzoneUser, error) {
+	one := &model.InzoneUser{}
+	err := getSession(ctx).Model(&model.InzoneUser{}).Where("cookie=?", cookie).First(one).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return model.InzoneUserTo(one), nil
+}
+
 func (a *InzoneUserRepo) GetByUUID(ctx context.Context, uuid string) (*pb.InzoneUser, error) {
 	one := &model.InzoneUser{}
 	err := getSession(ctx).Model(&model.InzoneUser{}).Where("uuid=?", uuid).First(one).Error

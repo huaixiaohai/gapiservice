@@ -13,10 +13,10 @@ type InzoneUser struct {
 	Remark          string
 	GroupID         string
 	CID             string `gorm:"column:cid;type:varchar(50);uniqueIndex"`
-	Cookie          string
+	Cookie          string `gorm:"type:varchar(100);uniqueIndex"`
 	CookieRefreshAt time.Time
 	CookieStatus    pb.ECookieStatus
-	UUID            string `gorm:"uuid;type:varchar(30);uniqueIndex"`
+	UUID            string `gorm:"column:uuid;type:varchar(30);uniqueIndex"`
 }
 
 func InzoneUserFrom(one *pb.InzoneUser) *InzoneUser {
