@@ -8,8 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/huaixiaohai/gapiservice/config"
 	"github.com/huaixiaohai/gapiservice/dao/model"
+
+	"github.com/huaixiaohai/gapiservice/config"
 
 	"gorm.io/gorm/logger"
 
@@ -22,13 +23,13 @@ import (
 )
 
 var Set = wire.NewSet(
-	InzoneUserGroupRepoSet,
-	InzoneUserRepoSet,
+	NovelRepoSet,
+	NovelResourceRepoSet,
 ) // end
 
 var models = []interface{}{
-	new(model.InzoneUserGroup),
-	new(model.InzoneUser),
+	new(model.Novel),
+	new(model.NovelResource),
 }
 
 var db *gorm.DB
