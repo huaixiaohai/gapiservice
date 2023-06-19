@@ -43,6 +43,43 @@ func IsValid(cookie string) bool {
 	return err == nil
 }
 
+func GetUserName(cookie string) (string, error) {
+	buf, err := query("http://wx0.yinzuo.cn/index.php/FinishInfo/finish_info.html", cookie)
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+	var doc *goquery.Document
+	doc, err = goquery.NewDocumentFromReader(bytes.NewBuffer(buf))
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+	context := doc.Find(".core").Find(".fz_16").Text()
+	context = strings.ReplaceAll(context, "\t", "")
+	context = strings.ReplaceAll(context, "\n", "")
+	context = context[0:9]
+	return context, nil
+}
+
+func GetPhone(cookie string) (string, error) {
+	buf, err := query("http://wx0.yinzuo.cn/index.php/Index/qdindex.html", cookie)
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+	var doc *goquery.Document
+	doc, err = goquery.NewDocumentFromReader(bytes.NewBuffer(buf))
+	if err != nil {
+		fmt.Println(err.Error())
+		return "", err
+	}
+	context := doc.Find(".gr_hy").Find(".gr_ri_txt").Text()
+	context = strings.ReplaceAll(context, "\t", "")
+	context = strings.ReplaceAll(context, "\n", "")
+	return context, nil
+}
+
 func GetCID(cookie string) (string, error) {
 	buf, err := query("http://wx0.yinzuo.cn/index.php/MaoTCT/indexnew.html", cookie)
 	if err != nil {
@@ -63,6 +100,21 @@ func GetCID(cookie string) (string, error) {
 	cid = strings.ReplaceAll(cid, " ", "")
 
 	return cid, nil
+}
+
+func IsLuck(cookie string) (bool, error) {
+	buf, err := query("http://wx0.yinzuo.cn/index.php/MaoTCT/mycounpon.html", cookie)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false, err
+	}
+	//var doc *goquery.Document
+	//doc, err = goquery.NewDocumentFromReader(bytes.NewBuffer(buf))
+	//if err != nil {
+	//	fmt.Println(err.Error())
+	//	return false, err
+	//}
+	return !strings.Contains(string(buf), "暂无资格"), nil
 }
 
 func GetIndex(cookie string) ([]byte, error) {

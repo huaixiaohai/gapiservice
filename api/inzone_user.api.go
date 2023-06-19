@@ -1,8 +1,15 @@
 package api
 
 import (
+	"bytes"
 	"context"
+	"fmt"
+	"net/http"
 	"time"
+
+	"github.com/huaixiaohai/gapiservice/config"
+
+	"github.com/robfig/cron/v3"
 
 	"github.com/huaixiaohai/gapiservice/inzone"
 
@@ -27,6 +34,13 @@ func NewInzoneUserApi(
 	}
 
 	go ins.refreshCookie(context.Background())
+
+	c := cron.New(cron.WithSeconds())
+	_, err := c.AddFunc(config.C.Cron.GetLuckUserJob, ins.LuckJob)
+	if err != nil {
+		panic(err)
+	}
+	c.Start()
 	return ins
 }
 
@@ -129,6 +143,23 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 		log.Error(err.Error())
 		return nil, err
 	}
+	time.Sleep(time.Millisecond * 100)
+	phone, err := inzone.GetPhone(cookie.String())
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
+	time.Sleep(time.Millisecond * 100)
+	name, err := inzone.GetUserName(cookie.String())
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
+	err = a.userRepo.UpdatePhone(ctx, phone, name, cid)
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
 	return &pb.Empty{}, nil
 }
 
@@ -167,9 +198,86 @@ func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
 				log.Error(err)
 				continue
 			}
+
+			if cookieStatus == pb.ECookieStatusValid {
+				if inzoneUser.Phone == "" {
+					time.Sleep(time.Millisecond * 100)
+					phone, err := inzone.GetPhone(inzoneUser.Cookie)
+					if err != nil {
+						log.Error(err.Error())
+					}
+					err = a.userRepo.UpdatePhone(ctx, phone, inzoneUser.Name, inzoneUser.CID)
+					if err != nil {
+						log.Error(err.Error())
+					}
+				}
+				if inzoneUser.Name == "" {
+					time.Sleep(time.Millisecond * 100)
+					name, err := inzone.GetUserName(inzoneUser.Cookie)
+					if err != nil {
+						log.Error(err.Error())
+						log.Error(err.Error())
+					}
+					err = a.userRepo.UpdatePhone(ctx, inzoneUser.Phone, name, inzoneUser.CID)
+					if err != nil {
+						log.Error(err.Error())
+					}
+				}
+			}
+
 			time.Sleep(time.Millisecond * 300)
+
 		}
 		println(startTime + 2400 - time.Now().Local().Unix())
 		sleepTime = time.Duration(startTime+3000-time.Now().Local().Unix()) * time.Second
+	}
+}
+
+func (a *InzoneUserApi) LuckJob() {
+	users, err := a.userRepo.List(context.Background(), &dao.InzoneUserListReq{
+		CookieStatus: pb.ECookieStatusValid,
+	})
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	for _, user := range users {
+		b, err := inzone.IsLuck(user.Cookie)
+		if err != nil {
+			log.Error(err)
+			continue
+		}
+		if b {
+			pushLuckMsg("", user.Name, user.Phone)
+		}
+	}
+}
+
+func pushLuckMsg(hook, name, phone string) {
+	hook = "https://oapi.dingtalk.com/robot/send?access_token=014a2ccdb00864a4db8fdc3f63b507b4cb3e8bde3b6d94cbf7711c4e25dacf69"
+
+	text := fmt.Sprintf("中奖用户:%s, %s \n", phone, name)
+
+	fmt.Println(text)
+	//for _, v := range records {
+	//	text += fmt.Sprintf("%s  (%d人)\n", v.Goods, len(v.Users))
+	//	for _, user := range v.Users {
+	//		text += "   " + user.Name + "  " + user.Phone + "  " + user.Remark + "\n"
+	//	}
+	//}
+
+	msg := fmt.Sprintf(`{
+	   "msgtype": "text",
+	   "text": {
+	       "content": "%s"
+	   }
+	}`, text)
+
+	r := bytes.NewBuffer([]byte(msg))
+	_, err := http.Post(hook, "application/json", r)
+	if err != nil {
+		fmt.Println("发送失败", err.Error())
+	} else {
+		fmt.Println("发送成功")
 	}
 }

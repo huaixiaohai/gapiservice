@@ -170,3 +170,8 @@ func (a *InzoneUserRepo) UpdateCookie(ctx context.Context, cid string, cookie st
 	}
 	return nil
 }
+
+func (a *InzoneUserRepo) UpdatePhone(ctx context.Context, phone, name, cid string) error {
+	return getSession(ctx).Model(&model.InzoneUser{}).Where("cid=?", cid).Updates(map[string]interface{}{"phone": phone, "name": name}).Error
+
+}
