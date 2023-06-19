@@ -36,6 +36,7 @@ func NewInzoneUserApi(
 	go ins.refreshCookie(context.Background())
 
 	c := cron.New(cron.WithSeconds())
+	fmt.Println(config.C.Cron, config.C.Cron.GetLuckUserJob)
 	_, err := c.AddFunc(config.C.Cron.GetLuckUserJob, ins.LuckJob)
 	if err != nil {
 		panic(err)
