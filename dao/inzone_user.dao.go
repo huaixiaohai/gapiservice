@@ -45,6 +45,14 @@ func (a *InzoneUserRepo) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
+func (a *InzoneUserRepo) DeleteByCID(ctx context.Context, cid string) error {
+	err := getSession(ctx).Model(&model.InzoneUser{}).Where("cid=?", cid).Delete(&model.InzoneUser{}).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *InzoneUserRepo) Get(ctx context.Context, id string) (*pb.InzoneUser, error) {
 	one := &model.InzoneUser{}
 	err := getSession(ctx).Model(&model.InzoneUser{}).Where("id=?", id).First(one).Error

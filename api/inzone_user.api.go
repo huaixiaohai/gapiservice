@@ -139,7 +139,8 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 		log.Error(err.Error())
 		return nil, err
 	}
-	err = a.userRepo.UpdateCookie(ctx, cid, cookie.String(), pb.ECookieStatusValid)
+
+	err = a.userRepo.DeleteByCID(ctx, cid)
 	if err != nil {
 		log.Error(err.Error())
 		return nil, err
@@ -156,7 +157,19 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 		log.Error(err.Error())
 		return nil, err
 	}
-	err = a.userRepo.UpdatePhone(ctx, phone, name, cid)
+	err = a.userRepo.Create(ctx, &pb.InzoneUser{
+		ID:              cid,
+		Name:            name,
+		Phone:           phone,
+		Remark:          "",
+		GroupID:         "",
+		GroupName:       "",
+		Cookie:          cookie.String(),
+		CookieRefreshAt: time.Now().Local().Unix(),
+		CookieStatus:    pb.ECookieStatusValid,
+		UUID:            "",
+		CID:             cid,
+	})
 	if err != nil {
 		log.Error(err.Error())
 		return nil, err
@@ -170,7 +183,7 @@ func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
 	for {
 		time.Sleep(sleepTime)
 		startTime := time.Now().Local().Unix()
-		ids, err := a.userRepo.GetIDsByCookieStatus(ctx, pb.ECookieStatusValid)
+		ids, err := a.userRepo.GetIDsByCookieStatus(ctx, pb.ECookieStatusInvalid)
 		if err != nil {
 			log.Error(err)
 			sleepTime = time.Minute
@@ -198,32 +211,6 @@ func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
 			if err != nil {
 				log.Error(err)
 				continue
-			}
-
-			if cookieStatus == pb.ECookieStatusValid {
-				if inzoneUser.Phone == "" {
-					time.Sleep(time.Millisecond * 100)
-					phone, err := inzone.GetPhone(inzoneUser.Cookie)
-					if err != nil {
-						log.Error(err.Error())
-					}
-					err = a.userRepo.UpdatePhone(ctx, phone, inzoneUser.Name, inzoneUser.CID)
-					if err != nil {
-						log.Error(err.Error())
-					}
-				}
-				if inzoneUser.Name == "" {
-					time.Sleep(time.Millisecond * 100)
-					name, err := inzone.GetUserName(inzoneUser.Cookie)
-					if err != nil {
-						log.Error(err.Error())
-						log.Error(err.Error())
-					}
-					err = a.userRepo.UpdatePhone(ctx, inzoneUser.Phone, name, inzoneUser.CID)
-					if err != nil {
-						log.Error(err.Error())
-					}
-				}
 			}
 
 			time.Sleep(time.Millisecond * 300)
