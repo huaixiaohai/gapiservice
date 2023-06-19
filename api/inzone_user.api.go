@@ -139,12 +139,6 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 		log.Error(err.Error())
 		return nil, err
 	}
-
-	err = a.userRepo.DeleteByCID(ctx, cid)
-	if err != nil {
-		log.Error(err.Error())
-		return nil, err
-	}
 	time.Sleep(time.Millisecond * 100)
 	phone, err := inzone.GetPhone(cookie.String())
 	if err != nil {
@@ -157,19 +151,41 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 		log.Error(err.Error())
 		return nil, err
 	}
-	err = a.userRepo.Create(ctx, &pb.InzoneUser{
-		ID:              cid,
-		Name:            name,
-		Phone:           phone,
-		Remark:          "",
-		GroupID:         "",
-		GroupName:       "",
-		Cookie:          cookie.String(),
-		CookieRefreshAt: time.Now().Local().Unix(),
-		CookieStatus:    pb.ECookieStatusValid,
-		UUID:            "",
-		CID:             cid,
-	})
+
+	inzoneUser, err := a.userRepo.Get(ctx, cid)
+	if err != nil {
+		log.Error(err.Error())
+		return nil, err
+	}
+	if inzoneUser == nil {
+		err = a.userRepo.Create(ctx, &pb.InzoneUser{
+			ID:              cid,
+			Name:            name,
+			Phone:           phone,
+			Remark:          "",
+			GroupID:         "",
+			GroupName:       "",
+			Cookie:          cookie.String(),
+			CookieRefreshAt: time.Now().Local().Unix(),
+			CookieStatus:    pb.ECookieStatusValid,
+			UUID:            "",
+			CID:             cid,
+		})
+	} else {
+		err = a.userRepo.Update(ctx, &pb.InzoneUser{
+			ID:              cid,
+			Name:            name,
+			Phone:           phone,
+			Remark:          "",
+			GroupID:         "",
+			GroupName:       "",
+			Cookie:          cookie.String(),
+			CookieRefreshAt: time.Now().Local().Unix(),
+			CookieStatus:    pb.ECookieStatusValid,
+			UUID:            "",
+			CID:             cid,
+		})
+	}
 	if err != nil {
 		log.Error(err.Error())
 		return nil, err

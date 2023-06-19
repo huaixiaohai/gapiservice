@@ -3,17 +3,18 @@ module github.com/huaixiaohai/gapiservice
 go 1.17
 
 require (
+	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.9.0
 	github.com/google/wire v0.5.0
 	github.com/huaixiaohai/lib v0.0.0-20230321134522-6f870e739966
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/viper v1.15.0
 	gorm.io/driver/mysql v1.4.7
 	gorm.io/gorm v1.24.6
 )
 
 require (
-	github.com/PuerkitoBio/goquery v1.8.1 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/bytedance/sonic v1.8.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
@@ -37,7 +38,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
-	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/sony/sonyflake v1.1.0 // indirect
 	github.com/spf13/afero v1.9.3 // indirect
