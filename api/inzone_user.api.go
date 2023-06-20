@@ -199,7 +199,7 @@ func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
 	for {
 		time.Sleep(sleepTime)
 		startTime := time.Now().Local().Unix()
-		ids, err := a.userRepo.GetIDsByCookieStatus(ctx, pb.ECookieStatusInvalid)
+		ids, err := a.userRepo.GetIDsByCookieStatus(ctx, pb.ECookieStatusValid)
 		if err != nil {
 			log.Error(err)
 			sleepTime = time.Minute
