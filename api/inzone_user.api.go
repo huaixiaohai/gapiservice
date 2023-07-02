@@ -197,9 +197,10 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
 	sleepTime := time.Second
 	for {
+		inzone.IsLuck("PHPSESSID=otu8v8oj4vqcgiucpipmefmb27")
 		time.Sleep(sleepTime)
 		startTime := time.Now().Local().Unix()
-		ids, err := a.userRepo.GetIDsByCookieStatus(ctx, pb.ECookieStatusInvalid)
+		ids, err := a.userRepo.GetIDsByCookieStatus(ctx, pb.ECookieStatusValid)
 		if err != nil {
 			log.Error(err)
 			sleepTime = time.Minute
@@ -260,7 +261,7 @@ func (a *InzoneUserApi) LuckJob() {
 func pushLuckMsg(hook, name, phone string) {
 	hook = "https://oapi.dingtalk.com/robot/send?access_token=014a2ccdb00864a4db8fdc3f63b507b4cb3e8bde3b6d94cbf7711c4e25dacf69"
 
-	text := fmt.Sprintf("中奖用户:%s, %s \n", phone, name)
+	text := fmt.Sprintf("今日消息 \n中奖用户:%s, %s \n", phone, name)
 
 	fmt.Println(text)
 	//for _, v := range records {
