@@ -59,7 +59,8 @@ func GetUserName(cookie string) (string, error) {
 	context = strings.ReplaceAll(context, "\t", "")
 	context = strings.ReplaceAll(context, "\n", "")
 	context = context[0:9]
-	return context, nil
+	ss := strings.Split(context, " ")
+	return ss[0], nil
 }
 
 func GetPhone(cookie string) (string, error) {
