@@ -10,5 +10,5 @@ type Empty struct {
 }
 
 type File struct {
-	FileHeader *multipart.FileHeader `json:"file_header" form:"file_header"`
+	FileHeader *multipart.FileHeader `json:"file" form:"file"`
 }

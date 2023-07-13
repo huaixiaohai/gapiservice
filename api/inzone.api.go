@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/huaixiaohai/lib/log"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/huaixiaohai/gapiservice/dao"
@@ -72,12 +74,20 @@ func (a *InzoneApi) Upload(ctx *gin.Context, req *pb.File) (*pb.Empty, error) {
 }
 
 func (a *InzoneApi) Download(ctx *gin.Context) {
-	buf, _ := os.ReadFile(path.Join(config.C.BasePath, "config", "user.xlsx"))
+	buf, err := os.ReadFile(path.Join(config.C.BasePath, "config", "user.xlsx"))
+	if err != nil {
+		log.Error(err)
+	}
 	ctx.Writer.WriteHeader(http.StatusOK)
 	ctx.Header("Content-Disposition", "attachment; filename=users.xlsx")
-	ctx.Header("Content-Type", "application/text/plain")
+	ctx.Header("Content-Type", "application/octet-stream")
 	ctx.Header("Accept-Length", fmt.Sprintf("%d", len(buf)))
-	ctx.Writer.Write(buf)
+	var n int
+	n, err = ctx.Writer.Write(buf)
+	if err != nil {
+		log.Error(err)
+	}
+	log.Info(n)
 }
 
 // Run run
