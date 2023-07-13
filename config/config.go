@@ -19,14 +19,15 @@ var (
 )
 
 type Config struct {
-	RunEnv         string
-	ServerName     string
-	Log            *Log
-	Http           *Http
-	Gorm           *Gorm
-	MySQL          *MySQL
-	Cron           *Cron
-	CookieUserUUID string
+	RunEnv     string
+	ServerName string
+	BasePath   string
+	Log        *Log
+	Http       *Http
+	Gorm       *Gorm
+	MySQL      *MySQL
+	Cron       *Cron
+	DingTalks  []*DingTalk
 }
 
 type Cron struct {
@@ -57,6 +58,11 @@ type Gorm struct {
 	EnableAutoMigrate bool
 }
 
+type DingTalk struct {
+	Hook  string
+	Sheet string
+}
+
 // MySQL mysql配置参数
 type MySQL struct {
 	Host       string
@@ -71,6 +77,14 @@ type MySQL struct {
 func (a MySQL) DSN() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?%s",
 		a.User, a.Password, a.Host, a.Port, a.DBName, a.Parameters)
+}
+
+func GetSheet2Hook() map[string]string {
+	res := make(map[string]string)
+	for _, v := range C.DingTalks {
+		res[v.Sheet] = v.Hook
+	}
+	return res
 }
 
 func init() {

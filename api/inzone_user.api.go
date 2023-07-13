@@ -35,19 +35,20 @@ func NewInzoneUserApi(
 
 	go ins.refreshCookie(context.Background())
 
-	c := cron.New(cron.WithSeconds())
+	ins.c = cron.New(cron.WithSeconds())
 	fmt.Println(config.C.Cron, config.C.Cron.GetLuckUserJob)
-	_, err := c.AddFunc(config.C.Cron.GetLuckUserJob, ins.LuckJob)
+	_, err := ins.c.AddFunc(config.C.Cron.GetLuckUserJob, ins.LuckJob)
 	if err != nil {
 		panic(err)
 	}
-	c.Start()
+	ins.c.Start()
 	return ins
 }
 
 type InzoneUserApi struct {
 	userRepo      *dao.InzoneUserRepo
 	userGroupRepo *dao.InzoneUserGroupRepo
+	c             *cron.Cron
 }
 
 func (a *InzoneUserApi) Create(ctx *gin.Context, req *pb.InzoneUser) (*pb.ID, error) {
@@ -197,7 +198,6 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
 	sleepTime := time.Second
 	for {
-		inzone.IsLuck("PHPSESSID=otu8v8oj4vqcgiucpipmefmb27")
 		time.Sleep(sleepTime)
 		startTime := time.Now().Local().Unix()
 		ids, err := a.userRepo.GetIDsByCookieStatus(ctx, pb.ECookieStatusValid)

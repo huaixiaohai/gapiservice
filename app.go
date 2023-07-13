@@ -110,6 +110,9 @@ func (a *App) registerRouter() {
 
 	g.GET("/index.php/MaoTCTx/index.html", wrapper(a.inzoneUserApi.UpdateCookie))
 	g.GET("/index.php/MaoTCT/indexnew.html", wrapper(a.inzoneUserApi.UpdateCookie))
+
+	g.POST("api/v1/upload", wrapper(a.inzoneApi.Upload))
+	g.GET("api/v1/download", a.inzoneApi.Download)
 }
 
 func wrapper(f interface{}) func(*gin.Context) {

@@ -1,0 +1,1 @@
+{"data":[{"name":"DEVICE_ID_VENDOR_ID_REG","addr":"0x7F00200000","value":"0x3101ed5"},{"name":"PF0_LINK_CAPABILITIES_REG","addr":"0x7F0020007C","value":"0x433105"},{"name":"PF1_LINK_CAPABILITIES_REG","addr":"0x7F0020107C","value":"0x433105"},{"name":"AMBA_ERROR_RESPONSE_DEFAULT_OFF","addr":"0x7F002008D0","value":"0x9C01"}]}
