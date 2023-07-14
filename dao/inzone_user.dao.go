@@ -139,7 +139,11 @@ func (a *InzoneUserRepo) listReq(ctx context.Context, req *InzoneUserListReq) *g
 	if req.CookieStatus != pb.ECookieStatusNone {
 		s.Where("cookie_status = ?", req.CookieStatus)
 	}
-	return s.Order("id desc").Limit(int(req.PageSize)).Offset(int((req.PageIndex - 1) * req.PageSize))
+	s.Order("id desc")
+	if req.PageSize != 0 {
+		s.Limit(int(req.PageSize)).Offset(int((req.PageIndex - 1) * req.PageSize))
+	}
+	return s
 }
 
 //func (a *InzoneUserRepo) GetUsers(ctx context.Context) ([]*pb.InzoneUser, error) {
