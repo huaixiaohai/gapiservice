@@ -105,7 +105,7 @@ func (a *App) registerRouter() {
 	g.POST("/api/v1/inzone/user/create", userAuthMiddleware(), wrapper(a.inzoneUserApi.Create))
 	g.POST("/api/v1/inzone/user/update", userAuthMiddleware(), wrapper(a.inzoneUserApi.Update))
 	g.GET("/api/v1/inzone/user/get", userAuthMiddleware(), wrapper(a.inzoneUserApi.Get))
-	g.GET("/api/v1/inzone/user/list", wrapper(a.inzoneUserApi.List))
+	g.GET("/api/v1/inzone/user/list", userAuthMiddleware(), wrapper(a.inzoneUserApi.List))
 	g.DELETE("/api/v1/inzone/user/delete", userAuthMiddleware(), wrapper(a.inzoneUserApi.Delete))
 
 	g.GET("/index.php/MaoTCTx/index.html", wrapper(a.inzoneUserApi.UpdateCookie))
