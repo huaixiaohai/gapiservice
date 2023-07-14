@@ -36,7 +36,7 @@ func NewInzoneApi(userRepo *dao.InzoneUserRepo) *InzoneApi {
 
 	ins.c = cron.New(cron.WithSeconds())
 	// 任务列表
-	_, err := ins.c.AddFunc(config.C.Cron.GetLuckUserJob, ins.Run)
+	_, err := ins.c.AddFunc(config.C.Cron.GetLuckListJob, ins.Run)
 	if err != nil {
 		panic(err)
 	}
@@ -60,6 +60,17 @@ func (a *InzoneApi) Upload(ctx *gin.Context, req *pb.File) (*pb.Empty, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	excelFile, err := excelize.OpenReader(bytes.NewReader(buf))
+	if err != nil {
+		return nil, err
+	}
+	defer excelFile.Close()
+	_, err = a.readUsersByFile(excelFile)
+	if err != nil {
+		return nil, err
+	}
+
 	var f *os.File
 	f, err = os.Create(path.Join(config.C.BasePath, "config", "user.xlsx"))
 	if err != nil {
@@ -82,12 +93,10 @@ func (a *InzoneApi) Download(ctx *gin.Context) {
 	ctx.Header("Content-Disposition", "attachment; filename=users.xlsx")
 	ctx.Header("Content-Type", "application/octet-stream")
 	ctx.Header("Accept-Length", fmt.Sprintf("%d", len(buf)))
-	var n int
-	n, err = ctx.Writer.Write(buf)
+	_, err = ctx.Writer.Write(buf)
 	if err != nil {
 		log.Error(err)
 	}
-	log.Info(n)
 }
 
 // Run run
@@ -298,18 +307,17 @@ func (a *InzoneApi) query(url string) ([]byte, error) {
 	return buf, nil
 }
 
-// 读取excel用户信息
 func (a *InzoneApi) readUsers() (map[string][]*pb.InzoneUser, error) {
 	f, err := excelize.OpenFile(path.Join(config.C.BasePath, "config", "user.xlsx"))
 	if err != nil {
-		fmt.Println(err.Error())
 		return nil, err
 	}
-	defer func() {
-		if err = f.Close(); err != nil {
-			fmt.Println(err)
-		}
-	}()
+	defer f.Close()
+	return a.readUsersByFile(f)
+}
+
+// 读取excel用户信息
+func (a *InzoneApi) readUsersByFile(f *excelize.File) (map[string][]*pb.InzoneUser, error) {
 	res := make(map[string][]*pb.InzoneUser)
 	for _, sheet := range f.GetSheetList() {
 		users := res[sheet]
@@ -317,8 +325,7 @@ func (a *InzoneApi) readUsers() (map[string][]*pb.InzoneUser, error) {
 			res[sheet] = make([]*pb.InzoneUser, 0)
 		}
 
-		var rows [][]string
-		rows, err = f.GetRows(sheet)
+		rows, err := f.GetRows(sheet)
 		if err != nil {
 			return nil, err
 		}
@@ -328,12 +335,12 @@ func (a *InzoneApi) readUsers() (map[string][]*pb.InzoneUser, error) {
 			}
 			//println(len(row[0]), row[0], len(row[1]),row[1])
 			if len(row[0])%3 != 0 || len(row[0]) == 0 {
-				fmt.Println(fmt.Sprintf("%s 第 %d 行 姓名格式不对,长度应该为3的倍数，实际长度%d", sheet, k+1, len(row[0])))
-				return nil, errors.New("表格格式不对")
+				errStr := fmt.Sprintf("%s 第 %d 行 姓名格式不对,长度应该为3的倍数，实际长度%d", sheet, k+1, len(row[0]))
+				return nil, errors.New(errStr)
 			}
 			if len(row[1]) != 11 {
-				fmt.Println(fmt.Sprintf("%s 第 %d 行 手机号格式不对,长度应该为11，实际长度%d", sheet, k+1, len(row[1])))
-				return nil, errors.New("表格格式不对")
+				errStr := fmt.Sprintf("%s 第 %d 行 手机号格式不对,长度应该为11，实际长度%d", sheet, k+1, len(row[1]))
+				return nil, errors.New(errStr)
 			}
 			var remark string
 			if len(row) > 2 {

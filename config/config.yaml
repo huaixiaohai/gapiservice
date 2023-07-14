@@ -29,7 +29,7 @@ MySQL:
   Parameters: "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true" # 连接参数
 
 Cron:
-  GetLuckListJob: "0 54 12 * * *" # 每天10.30开始执行，<秒 分 时 * * *>
+  GetLuckListJob: "0 17 12 * * *" # 每天10.30开始执行，<秒 分 时 * * *>
   GetLuckUserJob: "0 17 17 * * *"
 
 DingTalks: # 一组数据对应一个 < 机器人连接 + 数据表的sheet名称  >
