@@ -29,7 +29,7 @@ MySQL:
   Parameters: "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true" # 连接参数
 
 Cron:
-  GetLuckListJob: "0 17 12 * * *" # 每天10.30开始执行，<秒 分 时 * * *>
+  GetLuckListJob: "0 4 13 * * *" # 每天10.30开始执行，<秒 分 时 * * *>
   GetLuckUserJob: "0 17 17 * * *"
 
 DingTalks: # 一组数据对应一个 < 机器人连接 + 数据表的sheet名称  >
@@ -37,3 +37,4 @@ DingTalks: # 一组数据对应一个 < 机器人连接 + 数据表的sheet名�
     Sheet: "Sheet1" #sheet名称
   - Hook: "XXXXhttps://oapi.dingtalk.com/robot/send?access_token=014a2ccdb00864a4db8fdc3f63b507b4cb3e8bde3b6d94cbf7711c4e25dacf69" #其他钉钉群机器人连接
     Sheet: "Sheet2" #sheet名称
+

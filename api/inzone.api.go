@@ -114,13 +114,6 @@ func (a *InzoneApi) Run() {
 		return
 	}
 
-	// 系列名单
-	res, err := a.getSeriesLuckUsers()
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-
 	sheet2Hook := config.GetSheet2Hook()
 
 	for sheet, hook := range sheet2Hook {
@@ -142,6 +135,20 @@ func (a *InzoneApi) Run() {
 				InzoneUsers: data,
 			}})
 		}()
+	}
+
+	// 系列名单
+	res, err := a.getSeriesLuckUsers()
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	for sheet, hook := range sheet2Hook {
+
+		fmt.Println(fmt.Sprintf("发送表:%s ======================", sheet))
+
+		users := myUsersM[sheet]
 
 		// 系列
 		func() {
