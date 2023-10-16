@@ -34,6 +34,7 @@ type Cron struct {
 	GetLuckListJob   string
 	RefreshCookieJob string
 	GetLuckUserJob   string
+	EnrollJob        string
 }
 
 type Log struct {

@@ -160,7 +160,7 @@ func (a *InzoneUserRepo) listReq(ctx context.Context, req *InzoneUserListReq) *g
 
 func (a *InzoneUserRepo) GetIDsByCookieStatus(ctx context.Context, cookieStatus pb.ECookieStatus) ([]string, error) {
 	ids := make([]string, 0)
-	err := getSession(ctx).Model(&model.InzoneUser{}).Select("id").Where("cookie_status=?", cookieStatus).Find(&ids).Error
+	err := getSession(ctx).Model(&model.InzoneUser{}).Select("id").Where("cookie_status=?", cookieStatus).Order("cookie_refresh_at").Find(&ids).Error
 	if err != nil {
 		log.Error(err)
 		return nil, err

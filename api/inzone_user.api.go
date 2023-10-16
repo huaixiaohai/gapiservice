@@ -41,6 +41,10 @@ func NewInzoneUserApi(
 	if err != nil {
 		panic(err)
 	}
+	_, err = ins.c.AddFunc(config.C.Cron.EnrollJob, ins.GetAppY)
+	if err != nil {
+		panic(err)
+	}
 	ins.c.Start()
 	return ins
 }
@@ -247,6 +251,7 @@ func (a *InzoneUserApi) LuckJob() {
 		return
 	}
 	for _, user := range users {
+		time.Sleep(time.Millisecond * 100)
 		b, err := inzone.IsLuck(user.Cookie)
 		if err != nil {
 			log.Error(err)
@@ -254,6 +259,24 @@ func (a *InzoneUserApi) LuckJob() {
 		}
 		if b {
 			pushLuckMsg("", user.Name, user.Phone)
+		}
+	}
+}
+
+// GetAppY 抽签报名
+func (a *InzoneUserApi) GetAppY() {
+	users, err := a.userRepo.List(context.Background(), &dao.InzoneUserListReq{
+		CookieStatus: pb.ECookieStatusValid,
+	})
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	for _, user := range users {
+		time.Sleep(time.Second * 2)
+		err = inzone.GetAppY(user.Cookie)
+		if err != nil {
+			log.Error(err)
 		}
 	}
 }
