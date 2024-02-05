@@ -36,10 +36,11 @@ type Luck struct {
 }
 
 func IsValid(cookie string) bool {
-	_, err := GetIndex(cookie)
+	buf, err := GetIndex(cookie)
 	if err != nil {
 		log.Error("cookie失效", err.Error())
 	}
+	fmt.Println("IsValid buf", string(buf))
 	return err == nil
 }
 

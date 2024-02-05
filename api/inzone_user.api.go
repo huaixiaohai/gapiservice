@@ -202,6 +202,7 @@ func (a *InzoneUserApi) UpdateCookie(ctx *gin.Context, req *pb.Empty) (*pb.Empty
 func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
 	sleepTime := time.Second
 	for {
+		fmt.Println("refreshCookie。。。")
 		time.Sleep(sleepTime)
 		startTime := time.Now().Local().Unix()
 		ids, err := a.userRepo.GetIDsByCookieStatus(ctx, pb.ECookieStatusValid)
@@ -214,7 +215,7 @@ func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
 			sleepTime = time.Minute
 			continue
 		}
-
+		fmt.Println("refreshCookie count：", len(ids))
 		for _, id := range ids {
 			inzoneUser, err := a.userRepo.Get(ctx, id)
 			if err != nil {
@@ -237,7 +238,7 @@ func (a *InzoneUserApi) refreshCookie(ctx context.Context) {
 			time.Sleep(time.Millisecond * 300)
 
 		}
-		println(startTime + 2400 - time.Now().Local().Unix())
+		println("SLEEP:", startTime+2400-time.Now().Local().Unix())
 		sleepTime = time.Duration(startTime+3000-time.Now().Local().Unix()) * time.Second
 	}
 }
