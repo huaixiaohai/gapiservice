@@ -122,7 +122,7 @@ func IsLuck(cookie string) (bool, error) {
 }
 
 func GetIndex(cookie string) ([]byte, error) {
-	buf, err := get("https://wx0.yinzuo.cn/index.php/MaoTCT/Index.html", cookie)
+	buf, err := get("https://wx0.yinzuo.cn/index.php/MaoTCT/index.html", cookie)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
