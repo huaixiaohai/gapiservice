@@ -95,6 +95,8 @@ func GetCID(cookie string) (string, error) {
 		return "", err
 	}
 	context := doc.Find(".uf.uf-ac.bottomData").Find(".uf.uf-f1.uf-col.uf-as.leftCon").Find(".uf.uf-pc.uf-f1.bottomDataLine").Text()
+	fmt.Println("buf...", string(buf))
+	fmt.Println("context", context)
 	if !strings.Contains(context, "CID: ") {
 		return "", errors.New("CID 查找不到")
 	}
