@@ -44,7 +44,7 @@ func IsValid(cookie string) bool {
 }
 
 func GetUserName(cookie string) (string, error) {
-	buf, err := get("http://wx0.yinzuo.cn/index.php/FinishInfo/finish_info.html", cookie)
+	buf, err := get("https://wx0.yinzuo.cn/index.php/FinishInfo/finish_info.html", cookie)
 	if err != nil {
 		fmt.Println(err.Error())
 		return "", err
@@ -64,7 +64,7 @@ func GetUserName(cookie string) (string, error) {
 }
 
 func GetPhone(cookie string) (string, error) {
-	buf, err := get("http://wx0.yinzuo.cn/index.php/Index/qdindex.html", cookie)
+	buf, err := get("https://wx0.yinzuo.cn/index.php/Index/qdindex.html", cookie)
 	if err != nil {
 		fmt.Println(err.Error())
 		return "", err
@@ -82,7 +82,7 @@ func GetPhone(cookie string) (string, error) {
 }
 
 func GetCID(cookie string) (string, error) {
-	buf, err := get("http://wx0.yinzuo.cn/index.php/MaoTCT/indexnew.html", cookie)
+	buf, err := get("https://wx0.yinzuo.cn/index.php/MaoTCT/indexnew.html", cookie)
 	if err != nil {
 		fmt.Println(err.Error())
 		return "", err
@@ -104,7 +104,7 @@ func GetCID(cookie string) (string, error) {
 }
 
 func IsLuck(cookie string) (bool, error) {
-	buf, err := get("http://wx0.yinzuo.cn/index.php/MaoTCT/mycounpon.html", cookie)
+	buf, err := get("https://wx0.yinzuo.cn/index.php/MaoTCT/mycounpon.html", cookie)
 	if err != nil {
 		fmt.Println(err.Error())
 		return false, err
@@ -119,7 +119,7 @@ func IsLuck(cookie string) (bool, error) {
 }
 
 func GetIndex(cookie string) ([]byte, error) {
-	buf, err := get("http://wx0.yinzuo.cn/index.php/MaoTCT/Index.html", cookie)
+	buf, err := get("https://wx0.yinzuo.cn/index.php/MaoTCT/Index.html", cookie)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
@@ -129,7 +129,7 @@ func GetIndex(cookie string) ([]byte, error) {
 
 // GetDailyLuckUsers 获取每日获奖名单那
 func GetDailyLuckUsers(cookie string) ([]*Luck, error) {
-	buf, err := get("http://wx0.yinzuo.cn/index.php/MaoTCT/luckshow.html", cookie)
+	buf, err := get("https://wx0.yinzuo.cn/index.php/MaoTCT/luckshow.html", cookie)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
@@ -158,7 +158,7 @@ func GetDailyLuckUsers(cookie string) ([]*Luck, error) {
 
 // GetSeriesLuckUsers 获取每日获奖名单那
 func GetSeriesLuckUsers(cookie string) ([]*Luck, error) {
-	buf, err := get("http://wx0.yinzuo.cn/index.php/MaoTCTx/luckshow.html", cookie)
+	buf, err := get("https://wx0.yinzuo.cn/index.php/MaoTCTx/luckshow.html", cookie)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
@@ -190,7 +190,7 @@ func GetSeriesLuckUsers(cookie string) ([]*Luck, error) {
 
 // GetAppY 抽签报名
 func GetAppY(cookie string) error {
-	_, err := post("http://wx0.yinzuo.cn/index.php/Home/MaoTCT/getappy", cookie)
+	_, err := post("https://wx0.yinzuo.cn/index.php/Home/MaoTCT/getappy", cookie)
 	if err != nil {
 		fmt.Println(err.Error())
 		return err
