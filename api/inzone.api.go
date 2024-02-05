@@ -210,7 +210,7 @@ func (a *InzoneApi) getDailyLuckUsers() (map[string]*pb.InzoneUser, error) {
 // 获取每日获奖名单那
 func (a *InzoneApi) getSeriesLuckUsers() ([]map[string]*pb.InzoneUser, error) {
 	for {
-		buf, err := a.query("http://wx0.yinzuo.cn/index.php/MaoTCTx/luckshow.html")
+		buf, err := a.query("http://wx0.yinzuo.cn/index.php/MaoTCT/luckshow.html")
 		if err != nil {
 			fmt.Println(err.Error())
 			return nil, err
