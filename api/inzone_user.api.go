@@ -251,6 +251,7 @@ func (a *InzoneUserApi) LuckJob() {
 		log.Error(err)
 		return
 	}
+	count := 0
 	for _, user := range users {
 		time.Sleep(time.Millisecond * 100)
 		b, err := inzone.IsLuck(user.Cookie)
@@ -259,9 +260,11 @@ func (a *InzoneUserApi) LuckJob() {
 			continue
 		}
 		if b {
-			pushLuckMsg("", user.Name, user.Phone)
+			count++
+			pushDDMsg(fmt.Sprintf("今日消息 \n中奖用户:%s, %s \n", user.Phone, user.Name))
 		}
 	}
+	pushDDMsg(fmt.Sprintf("今日中奖用户数:%d", count))
 }
 
 // GetAppY 抽签报名
@@ -282,27 +285,16 @@ func (a *InzoneUserApi) GetAppY() {
 	}
 }
 
-func pushLuckMsg(hook, name, phone string) {
-	hook = "https://oapi.dingtalk.com/robot/send?access_token=014a2ccdb00864a4db8fdc3f63b507b4cb3e8bde3b6d94cbf7711c4e25dacf69"
-
-	text := fmt.Sprintf("今日消息 \n中奖用户:%s, %s \n", phone, name)
-
-	fmt.Println(text)
-	//for _, v := range records {
-	//	text += fmt.Sprintf("%s  (%d人)\n", v.Goods, len(v.Users))
-	//	for _, user := range v.Users {
-	//		text += "   " + user.Name + "  " + user.Phone + "  " + user.Remark + "\n"
-	//	}
-	//}
-
-	msg := fmt.Sprintf(`{
+func pushDDMsg(msg string) {
+	hook := "https://oapi.dingtalk.com/robot/send?access_token=014a2ccdb00864a4db8fdc3f63b507b4cb3e8bde3b6d94cbf7711c4e25dacf69"
+	content := fmt.Sprintf(`{
 	   "msgtype": "text",
 	   "text": {
 	       "content": "%s"
 	   }
-	}`, text)
+	}`, msg)
 
-	r := bytes.NewBuffer([]byte(msg))
+	r := bytes.NewBuffer([]byte(content))
 	_, err := http.Post(hook, "application/json", r)
 	if err != nil {
 		fmt.Println("发送失败", err.Error())

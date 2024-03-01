@@ -21,16 +21,16 @@ Gorm:
   EnableAutoMigrate: true # 是否启用自动映射数据库表结构
 
 MySQL:
-  Host: "101.43.252.241" # 连接地址
+  Host: "13.209.88.122" # 连接地址
   Port: 3306 # 连接端口
   User: "root" # 用户名
-  Password: "pwd123" # 密码
+  Password: "root123" # 密码
   DBName: "inzone" # 数据库
   Parameters: "charset=utf8mb4&parseTime=True&loc=Local&allowNativePasswords=true" # 连接参数
 
 Cron:
   GetLuckListJob: "0 4 13 * * *" # 每天10.30开始执行，<秒 分 时 * * *>
-  GetLuckUserJob: "0 17 17 * * *"
+  GetLuckUserJob: "0 27 18 * * *"
   EnrollJob: "0 40 10 * * *"
 
 DingTalks: # 一组数据对应一个 < 机器人连接 + 数据表的sheet名称  >
