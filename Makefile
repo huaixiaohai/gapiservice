@@ -2,7 +2,7 @@
 # 定义项目基本信息
 COMMONENVVAR      ?= GOOS=linux GOARCH=amd64
 BUILDENVVAR       ?= CGO_ENABLED=0
-BIN_DIR        ?= $(CURDIR)/bin
+BIN_DIR        ?= $(CURDIR)/bin2
 
 # >>>>>>>>>>> 必须包含的命令 >>>>>>>>>
 
